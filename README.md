@@ -1,4 +1,4 @@
-# Tasklymeet Landing
+# Meetory Landing
 
 Static landing page refactored for cleaner structure without changing behavior.
 
