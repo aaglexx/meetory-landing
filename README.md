@@ -13,7 +13,3 @@ Static landing page refactored for cleaner structure without changing behavior.
   - `sections.css`
   - `responsive.css`
 - `styles.legacy.css` (backup of original stylesheet)
-
-## Deploy
-
-This is a static site and can be deployed directly to Vercel as-is.
