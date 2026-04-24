@@ -1,0 +1,2149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meetory — AI Meeting Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ─── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --bg:            #0E1012;
+      --bg-subtle:     #111316;
+      --surface:       #161A1E;
+      --surface-el:    #1C2026;
+      --surface-high:  #21262D;
+      --border:        #252B33;
+      --border-muted:  #1D2228;
+      --border-accent: rgba(76,111,255,.28);
+      --text-1:        #EDF0F4;
+      --text-2:        #94A0AE;
+      --text-3:        #5C6878;
+      --accent:        #4C6FFF;
+      --accent-h:      #3B5EFF;
+      --accent-dim:    rgba(76,111,255,.12);
+      --accent-glow:   rgba(76,111,255,.22);
+      --warn:          #F59E0B;
+      --warn-dim:      rgba(245,158,11,.12);
+      --success:       #22C55E;
+      --success-dim:   rgba(34,197,94,.10);
+      --danger:        #F43F5E;
+      --danger-dim:    rgba(244,63,94,.10);
+      --radius:        10px;
+      --radius-lg:     14px;
+      --shadow-card:   0 1px 3px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.28);
+      --shadow-float:  0 8px 40px rgba(0,0,0,.5), 0 2px 8px rgba(0,0,0,.3);
+      --font-head:     'Bricolage Grotesque', sans-serif;
+      --font-body:     'DM Sans', sans-serif;
+    }
+
+    /* ─── RESET ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text-1);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    /* ─── NOISE TEXTURE ──────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: .022;
+      pointer-events: none;
+      z-index: 0;
+    }
+    section, nav, footer, header { position: relative; z-index: 1; }
+
+    /* ─── LAYOUT ─────────────────────────────────────────── */
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 28px; }
+    .container--wide { max-width: 1320px; margin: 0 auto; padding: 0 28px; }
+
+    /* ─── TYPOGRAPHY ─────────────────────────────────────── */
+    .display {
+      font-family: var(--font-head);
+      font-size: clamp(38px, 5.5vw, 72px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      color: var(--text-1);
+    }
+    .display em { font-style: normal; color: var(--accent); }
+
+    .h2 {
+      font-family: var(--font-head);
+      font-size: clamp(26px, 3.5vw, 44px);
+      font-weight: 700;
+      line-height: 1.14;
+      letter-spacing: -0.025em;
+    }
+    .h3 {
+      font-family: var(--font-head);
+      font-size: clamp(18px, 2vw, 24px);
+      font-weight: 600;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+    .lead {
+      font-size: clamp(15px, 1.5vw, 18px);
+      color: var(--text-2);
+      line-height: 1.65;
+      font-weight: 400;
+    }
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    /* ─── BUTTONS ────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: var(--font-body);
+      font-size: 14px; font-weight: 500;
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      cursor: pointer; transition: all .18s ease;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 1px 3px rgba(76,111,255,.3), 0 0 0 0 rgba(76,111,255,0);
+    }
+    .btn-primary:hover {
+      background: var(--accent-h);
+      box-shadow: 0 4px 16px rgba(76,111,255,.4);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--surface-el);
+      color: var(--text-1);
+      border-color: var(--border);
+    }
+    .btn-secondary:hover {
+      background: var(--surface-high);
+      border-color: #333b45;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-2);
+      border-color: transparent;
+      padding: 9px 14px;
+    }
+    .btn-ghost:hover { color: var(--text-1); background: var(--surface); }
+
+    .btn-lg {
+      font-size: 15px;
+      padding: 11px 22px;
+    }
+    .btn-xl {
+      font-size: 16px;
+      padding: 13px 26px;
+      border-radius: 10px;
+    }
+
+    /* ─── BADGE ──────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .badge-accent { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--border-accent); }
+    .badge-warn   { background: var(--warn-dim);   color: var(--warn);   border: 1px solid rgba(245,158,11,.25); }
+    .badge-success{ background: var(--success-dim);color: var(--success);border: 1px solid rgba(34,197,94,.2); }
+    .badge-muted  { background: var(--surface-el); color: var(--text-2); border: 1px solid var(--border); }
+
+    .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .dot-accent  { background: var(--accent); }
+    .dot-warn    { background: var(--warn); }
+    .dot-success { background: var(--success); }
+    .dot-danger  { background: var(--danger); }
+
+    /* ─── CARD ───────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+    }
+
+    /* ─── DIVIDER ────────────────────────────────────────── */
+    .divider { height: 1px; background: var(--border-muted); margin: 0; }
+
+    /* ═══════════════════════════════════════════════════════
+       NAV
+    ═══════════════════════════════════════════════════════ */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      height: 58px;
+      display: flex; align-items: center;
+      border-bottom: 1px solid var(--border-muted);
+      background: rgba(14,16,18,.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .nav__inner {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .nav__logo {
+      display: flex; align-items: center; gap: 9px;
+      font-family: var(--font-head);
+      font-size: 17px; font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -.02em;
+    }
+    .nav__logo-icon {
+      width: 30px; height: 30px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: #fff;
+      font-family: var(--font-head);
+    }
+    .nav__links {
+      display: flex; align-items: center; gap: 2px;
+    }
+    .nav__links a {
+      font-size: 14px; color: var(--text-2); font-weight: 400;
+      padding: 6px 12px; border-radius: 7px;
+      transition: all .15s;
+    }
+    .nav__links a:hover { color: var(--text-1); background: var(--surface); }
+    .nav__cta { display: flex; align-items: center; gap: 8px; }
+
+    /* ═══════════════════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════════════════ */
+    .hero {
+      padding: 80px 0 0;
+      overflow: hidden;
+    }
+    .hero__text {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto 20px;
+    }
+    .hero__eyebrow {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; margin-bottom: 24px;
+    }
+    .hero__eyebrow-line {
+      width: 28px; height: 1px; background: var(--border);
+    }
+    .hero__headline {
+      margin-bottom: 22px;
+    }
+    .hero__sub {
+      max-width: 560px; margin: 0 auto 36px;
+    }
+    .hero__actions {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; flex-wrap: wrap; margin-bottom: 14px;
+    }
+    .hero__note {
+      font-size: 12px; color: var(--text-3);
+      text-align: center;
+    }
+    .hero__note span { color: var(--text-2); }
+
+    /* ─── PRODUCT MOCKUP ─────────────────────────────────── */
+    .hero__visual {
+      margin-top: 56px;
+      position: relative;
+    }
+    .hero__visual-glow {
+      position: absolute;
+      top: -60px; left: 50%;
+      transform: translateX(-50%);
+      width: 800px; height: 300px;
+      background: radial-gradient(ellipse at center, rgba(76,111,255,.14) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .mockup-wrap {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+      border-radius: 16px 16px 0 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      box-shadow: 0 -4px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.04) inset;
+      background: var(--bg-subtle);
+    }
+    .mockup-bar {
+      height: 38px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-muted);
+      display: flex; align-items: center;
+      padding: 0 14px; gap: 7px;
+    }
+    .mockup-bar__dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .mockup-bar__dot:nth-child(1) { background: #FF5F57; }
+    .mockup-bar__dot:nth-child(2) { background: #FFBD2E; }
+    .mockup-bar__dot:nth-child(3) { background: #28C840; }
+    .mockup-bar__url {
+      flex: 1; display: flex; justify-content: center;
+    }
+    .mockup-bar__urlpill {
+      background: var(--surface-el);
+      border: 1px solid var(--border-muted);
+      border-radius: 5px;
+      padding: 3px 12px;
+      font-size: 11px; color: var(--text-3);
+      font-family: var(--font-body);
+    }
+
+    /* ─── DASHBOARD UI ───────────────────────────────────── */
+    .mockup-ui {
+      display: flex;
+      height: 520px;
+      background: var(--bg-subtle);
+      font-size: 11.5px;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .mock-sidebar {
+      width: 196px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border-muted);
+      display: flex; flex-direction: column;
+      padding: 12px 0;
+    }
+    .mock-sidebar__logo {
+      display: flex; align-items: center; gap: 8px;
+      padding: 2px 14px 14px;
+      border-bottom: 1px solid var(--border-muted);
+      margin-bottom: 8px;
+    }
+    .mock-sidebar__logo-icon {
+      width: 26px; height: 26px;
+      background: var(--accent); border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; color: #fff;
+      font-family: var(--font-head);
+    }
+    .mock-sidebar__logo-name {
+      font-size: 13px; font-weight: 700;
+      font-family: var(--font-head);
+      color: var(--text-1);
+    }
+    .mock-nav-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 14px;
+      color: var(--text-2); font-size: 12px;
+      border-radius: 0; cursor: default;
+      position: relative;
+    }
+    .mock-nav-item.active {
+      color: var(--text-1);
+      background: var(--surface-el);
+    }
+    .mock-nav-item__icon {
+      width: 14px; height: 14px; opacity: .7; flex-shrink: 0;
+    }
+    .mock-nav-item__badge {
+      margin-left: auto; background: var(--surface-high);
+      color: var(--text-3); font-size: 10px;
+      padding: 1px 5px; border-radius: 4px;
+      border: 1px solid var(--border-muted);
+    }
+    .mock-section-title {
+      padding: 12px 14px 4px;
+      font-size: 10px; font-weight: 600;
+      letter-spacing: .07em; text-transform: uppercase;
+      color: var(--text-3);
+    }
+    .mock-person {
+      display: flex; align-items: center; gap: 7px;
+      padding: 5px 14px; cursor: default;
+    }
+    .mock-avatar {
+      width: 22px; height: 22px; border-radius: 50%;
+      flex-shrink: 0; display: flex; align-items: center;
+      justify-content: center; font-size: 9px; font-weight: 700; color: #fff;
+    }
+    .mock-person-info { flex: 1; min-width: 0; }
+    .mock-person-name { font-size: 11.5px; color: var(--text-1); font-weight: 500; }
+    .mock-person-status { font-size: 10px; color: var(--text-3); }
+    .mock-meeting-pill {
+      display: flex; align-items: center; gap: 7px;
+      padding: 5px 14px; cursor: default;
+    }
+    .mock-meeting-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+    .mock-meeting-name { font-size: 11.5px; color: var(--text-2); }
+    .mock-meeting-badge {
+      margin-left: auto; font-size: 10px; color: var(--text-3);
+    }
+    .mock-sidebar__bottom {
+      margin-top: auto; padding: 10px 10px 0;
+      border-top: 1px solid var(--border-muted);
+    }
+    .mock-plan-card {
+      background: var(--surface-el);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 10px;
+    }
+    .mock-plan-label {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 10.5px; color: var(--text-2); margin-bottom: 6px;
+    }
+    .mock-plan-badge {
+      background: var(--warn-dim); color: var(--warn);
+      border: 1px solid rgba(245,158,11,.25);
+      font-size: 9px; font-weight: 600;
+      padding: 1px 6px; border-radius: 4px;
+    }
+    .mock-progress-track {
+      height: 3px; background: var(--border);
+      border-radius: 2px; overflow: hidden; margin-bottom: 5px;
+    }
+    .mock-progress-fill {
+      height: 100%; background: var(--accent); border-radius: 2px;
+    }
+    .mock-plan-usage { font-size: 10px; color: var(--text-3); }
+
+    /* Main */
+    .mock-main {
+      flex: 1; min-width: 0;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .mock-topbar {
+      height: 46px; flex-shrink: 0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-muted);
+      display: flex; align-items: center;
+      padding: 0 18px; gap: 10px;
+    }
+    .mock-search {
+      flex: 1; max-width: 340px;
+      height: 28px;
+      background: var(--surface-el);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      display: flex; align-items: center; gap: 7px;
+      padding: 0 10px;
+      color: var(--text-3); font-size: 11.5px;
+    }
+    .mock-search-icon { opacity: .5; font-size: 11px; }
+    .mock-kbd {
+      margin-left: auto;
+      background: var(--surface-high);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 9.5px; color: var(--text-3);
+      padding: 1px 5px;
+    }
+    .mock-new-btn {
+      margin-left: auto;
+      background: var(--accent);
+      color: #fff; font-size: 11.5px; font-weight: 600;
+      padding: 5px 12px; border-radius: 7px;
+      display: flex; align-items: center; gap: 5px;
+      white-space: nowrap;
+    }
+    .mock-topbar-icon {
+      width: 28px; height: 28px;
+      border: 1px solid var(--border);
+      background: var(--surface-el);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--text-2);
+    }
+    .mock-user-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #4C6FFF; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700;
+    }
+
+    .mock-content {
+      flex: 1; overflow: hidden;
+      padding: 20px 22px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .mock-greeting { display: flex; align-items: flex-start; justify-content: space-between; }
+    .mock-greeting-text { }
+    .mock-greeting-title {
+      font-family: var(--font-head);
+      font-size: 18px; font-weight: 700; color: var(--text-1);
+      line-height: 1.2; margin-bottom: 3px;
+    }
+    .mock-greeting-sub { font-size: 11.5px; color: var(--text-2); }
+    .mock-date-badge {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--surface-el);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 5px 10px;
+      font-size: 11px; color: var(--text-2);
+    }
+
+    /* Stat cards */
+    .mock-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .mock-stat-card {
+      background: var(--surface-el);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 11px 13px;
+      position: relative; overflow: hidden;
+    }
+    .mock-stat-card.warn { border-color: rgba(245,158,11,.3); }
+    .mock-stat-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 7px;
+    }
+    .mock-stat-label {
+      font-size: 9.5px; font-weight: 600; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--text-3);
+    }
+    .mock-stat-icon { font-size: 11px; opacity: .5; }
+    .mock-stat-value {
+      font-family: var(--font-head);
+      font-size: 26px; font-weight: 700;
+      color: var(--text-1); line-height: 1;
+      margin-bottom: 3px;
+    }
+    .mock-stat-value span { font-size: 12px; color: var(--accent); font-weight: 500; }
+    .mock-stat-sub { font-size: 10px; color: var(--text-3); margin-bottom: 8px; }
+    .mock-stat-warn-items { font-size: 10px; color: var(--text-2); }
+    .mock-stat-warn-item {
+      display: flex; align-items: center; gap: 5px;
+      line-height: 1.6;
+    }
+    .mock-stat-warn-num { color: var(--warn); font-weight: 600; }
+    .mock-sparkline {
+      height: 28px; margin-top: 4px;
+      opacity: .6;
+    }
+
+    /* My Work */
+    .mock-work-section { flex: 1; min-height: 0; overflow: hidden; }
+    .mock-work-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .mock-work-title {
+      font-family: var(--font-head);
+      font-size: 14px; font-weight: 600; color: var(--text-1);
+    }
+    .mock-work-count { font-size: 11px; color: var(--text-2); }
+    .mock-tabs {
+      display: flex; gap: 2px; margin-bottom: 10px;
+      border-bottom: 1px solid var(--border-muted);
+      padding-bottom: 8px;
+    }
+    .mock-tab {
+      font-size: 11.5px; color: var(--text-2);
+      padding: 3px 8px; border-radius: 5px; cursor: default;
+    }
+    .mock-tab.active {
+      color: var(--text-1); background: var(--surface-high);
+    }
+    .mock-tab .num { margin-left: 4px; color: var(--text-3); }
+    .mock-table-head {
+      display: grid;
+      grid-template-columns: 1fr 100px 70px 75px 85px 20px;
+      gap: 8px;
+      padding: 5px 8px;
+      font-size: 10px; font-weight: 600; letter-spacing: .05em;
+      text-transform: uppercase; color: var(--text-3);
+      border-bottom: 1px solid var(--border-muted);
+      margin-bottom: 2px;
+    }
+    .mock-row {
+      display: grid;
+      grid-template-columns: 1fr 100px 70px 75px 85px 20px;
+      gap: 8px; align-items: center;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: default;
+    }
+    .mock-row:hover { background: var(--surface-el); }
+    .mock-row.active { background: rgba(76,111,255,.07); border: 1px solid rgba(76,111,255,.15); }
+    .mock-row-task { font-size: 12px; color: var(--text-1); font-weight: 500; }
+    .mock-row-task.active { color: var(--accent); }
+    .mock-row-meeting {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; color: var(--text-2);
+    }
+    .mock-row-dot { width: 7px; height: 7px; border-radius: 2px; }
+    .mock-row-priority {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 11px;
+    }
+    .mock-row-priority .dot { width: 5px; height: 5px; }
+    .mock-row-date { font-size: 11px; color: var(--text-2); }
+    .mock-row-date.overdue { color: var(--danger); font-weight: 500; }
+    .mock-status-pill {
+      font-size: 10.5px; font-weight: 500;
+      padding: 2px 8px; border-radius: 5px;
+      display: inline-flex; align-items: center;
+    }
+    .status-inprogress { background: rgba(76,111,255,.15); color: #8FA8FF; }
+    .status-blocked    { background: rgba(245,158,11,.12); color: var(--warn); }
+    .status-todo       { background: var(--surface-high); color: var(--text-2); }
+    .status-review     { background: rgba(34,197,94,.1); color: var(--success); }
+    .mock-row-more { font-size: 14px; color: var(--text-3); text-align: center; }
+
+    /* Right panel */
+    .mock-panel {
+      width: 260px; flex-shrink: 0;
+      background: var(--surface);
+      border-left: 1px solid var(--border-muted);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .mock-panel-header {
+      padding: 12px 14px 10px;
+      border-bottom: 1px solid var(--border-muted);
+      display: flex; align-items: flex-start; justify-content: space-between;
+    }
+    .mock-panel-id { font-size: 10px; color: var(--text-3); margin-bottom: 4px; }
+    .mock-panel-title {
+      font-family: var(--font-head);
+      font-size: 13px; font-weight: 600; color: var(--text-1);
+      line-height: 1.3;
+    }
+    .mock-panel-tags {
+      display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap;
+    }
+    .mock-panel-tag {
+      font-size: 10px; padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      background: var(--surface-el);
+    }
+    .mock-panel-tag.accent { color: var(--accent); border-color: var(--border-accent); background: var(--accent-dim); }
+    .mock-panel-tag.warn   { color: var(--warn); border-color: rgba(245,158,11,.25); background: var(--warn-dim); }
+    .mock-panel-body {
+      flex: 1; overflow: hidden;
+      padding: 12px 14px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .mock-props-section { }
+    .mock-props-title {
+      font-size: 9.5px; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--text-3); margin-bottom: 7px;
+    }
+    .mock-prop {
+      display: flex; align-items: center;
+      font-size: 11px; margin-bottom: 5px;
+    }
+    .mock-prop-key { width: 68px; color: var(--text-3); flex-shrink: 0; }
+    .mock-prop-val { color: var(--text-1); display: flex; align-items: center; gap: 5px; }
+    .mock-prop-avatar {
+      width: 16px; height: 16px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8px; font-weight: 700; color: #fff;
+    }
+    .mock-prop-date-warn { color: var(--warn); }
+    .mock-ai-card {
+      background: var(--surface-el);
+      border: 1px solid var(--border);
+      border-left: 2px solid var(--accent);
+      border-radius: 7px;
+      padding: 9px 10px;
+    }
+    .mock-ai-header {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 6px;
+    }
+    .mock-ai-icon {
+      width: 18px; height: 18px;
+      background: var(--accent); border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; color: #fff; font-weight: 700;
+    }
+    .mock-ai-label { font-size: 10.5px; font-weight: 600; color: var(--text-1); }
+    .mock-ai-from { font-size: 9.5px; color: var(--text-3); }
+    .mock-ai-quote {
+      font-size: 10.5px; color: var(--text-2);
+      line-height: 1.5;
+      border-left: 0; padding: 0;
+      font-style: italic;
+    }
+    .mock-ai-attribution { font-size: 10px; color: var(--text-3); margin-top: 5px; }
+    .mock-activity { }
+    .mock-activity-item {
+      display: flex; align-items: flex-start; gap: 7px;
+      margin-bottom: 7px;
+    }
+    .mock-act-avatar {
+      width: 18px; height: 18px; border-radius: 50%;
+      flex-shrink: 0; display: flex; align-items: center;
+      justify-content: center; font-size: 8px; font-weight: 700; color: #fff;
+    }
+    .mock-act-text { font-size: 10.5px; color: var(--text-2); line-height: 1.4; }
+    .mock-act-time { color: var(--text-3); font-size: 9.5px; }
+
+    /* ═══════════════════════════════════════════════════════
+       LOGOS
+    ═══════════════════════════════════════════════════════ */
+    .logos-section {
+      padding: 56px 0;
+      border-bottom: 1px solid var(--border-muted);
+    }
+    .logos-section__label {
+      text-align: center;
+      font-size: 12px; color: var(--text-3);
+      letter-spacing: .06em; text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .logos-track {
+      display: flex; align-items: center;
+      justify-content: center;
+      gap: 48px; flex-wrap: wrap;
+    }
+    .logos-track__logo {
+      font-family: var(--font-head);
+      font-size: 16px; font-weight: 700;
+      color: var(--text-3);
+      letter-spacing: -.02em;
+      opacity: .55;
+      transition: opacity .2s;
+    }
+    .logos-track__logo:hover { opacity: .9; }
+
+    /* ═══════════════════════════════════════════════════════
+       SECTION COMMON
+    ═══════════════════════════════════════════════════════ */
+    .section { padding: 100px 0; }
+    .section--tight { padding: 72px 0; }
+    .section__header {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto 60px;
+    }
+    .section__header .label { margin-bottom: 12px; }
+    .section__header .h2 { margin-bottom: 14px; }
+
+    /* ═══════════════════════════════════════════════════════
+       PROBLEM
+    ═══════════════════════════════════════════════════════ */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .problem-card__icon {
+      font-size: 22px; margin-bottom: 14px; opacity: .8;
+    }
+    .problem-card__title {
+      font-family: var(--font-head);
+      font-size: 15px; font-weight: 600;
+      color: var(--text-1); margin-bottom: 8px;
+    }
+    .problem-card__body {
+      font-size: 13.5px; color: var(--text-2); line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       FEATURES (split)
+    ═══════════════════════════════════════════════════════ */
+    .feature-split {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center;
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border-muted);
+    }
+    .feature-split:last-child { border-bottom: none; }
+    .feature-split.reverse .feature-split__visual { order: -1; }
+    .feature-split__label { margin-bottom: 12px; }
+    .feature-split__h { margin-bottom: 14px; }
+    .feature-split__body {
+      font-size: 15px; color: var(--text-2);
+      line-height: 1.7; margin-bottom: 28px;
+    }
+    .feature-list {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .feature-list__item {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; color: var(--text-2);
+    }
+    .feature-list__check {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--accent-dim); border: 1px solid var(--border-accent);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+      font-size: 10px; color: var(--accent);
+    }
+    .feature-split__visual {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-float);
+      position: relative;
+    }
+
+    /* Mini mockup cards inside feature visuals */
+    .mini-meeting-card {
+      background: var(--surface-el);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+    .mini-meeting-card:last-child { margin-bottom: 0; }
+    .mini-meeting-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .mini-meeting-title {
+      font-family: var(--font-head);
+      font-size: 13px; font-weight: 600; color: var(--text-1);
+    }
+    .mini-meeting-meta {
+      font-size: 11px; color: var(--text-3);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .mini-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+    .mini-badge {
+      font-size: 10.5px; padding: 2px 8px; border-radius: 4px;
+      display: inline-flex; align-items: center; gap: 4px;
+      font-weight: 500;
+    }
+    .mini-badge-tasks { background: var(--accent-dim); color: #8FA8FF; border: 1px solid var(--border-accent); }
+    .mini-badge-dec   { background: rgba(34,197,94,.1); color: var(--success); border: 1px solid rgba(34,197,94,.2); }
+    .mini-badge-risk  { background: var(--danger-dim); color: #F87171; border: 1px solid rgba(244,63,94,.2); }
+    .mini-ai-summary {
+      font-size: 11.5px; color: var(--text-2); line-height: 1.55;
+      border-left: 2px solid var(--accent);
+      padding-left: 10px;
+      margin-top: 8px;
+    }
+    .mini-action-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+    .mini-action-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11.5px; color: var(--text-1);
+    }
+    .mini-action-check {
+      width: 14px; height: 14px; border-radius: 3px;
+      border: 1.5px solid var(--border); flex-shrink: 0;
+    }
+    .mini-action-check.done {
+      background: var(--accent); border-color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; color: #fff;
+    }
+    .mini-action-owner {
+      margin-left: auto;
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .mini-action-due { font-size: 10px; color: var(--text-3); margin-left: 4px; }
+
+    /* Search mini-mockup */
+    .mini-search-bar {
+      background: var(--surface-el);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 12px;
+    }
+    .mini-search-icon { font-size: 13px; color: var(--text-3); }
+    .mini-search-text { font-size: 13px; color: var(--text-1); flex: 1; }
+    .mini-search-kbd { font-size: 10px; color: var(--text-3); background: var(--surface-high); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border); }
+    .mini-search-result {
+      background: var(--surface-el);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 14px;
+      margin-bottom: 7px;
+      transition: border-color .2s;
+    }
+    .mini-search-result.highlighted { border-color: var(--border-accent); background: rgba(76,111,255,.05); }
+    .mini-result-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+    }
+    .mini-result-icon { font-size: 12px; }
+    .mini-result-title { font-size: 12.5px; font-weight: 600; color: var(--text-1); }
+    .mini-result-date { font-size: 10.5px; color: var(--text-3); margin-left: auto; }
+    .mini-result-snippet { font-size: 11px; color: var(--text-2); line-height: 1.5; }
+    .mini-result-highlight { color: var(--accent); font-weight: 500; }
+
+    /* Context visual */
+    .mini-context-card {
+      background: var(--surface-el);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 13px 15px;
+      margin-bottom: 9px;
+    }
+    .mini-ctx-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+    }
+    .mini-ctx-icon {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: var(--accent-dim); border: 1px solid var(--border-accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+    .mini-ctx-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
+    .mini-ctx-sub { font-size: 10.5px; color: var(--text-3); }
+    .mini-ctx-body { font-size: 11.5px; color: var(--text-2); line-height: 1.55; }
+    .mini-ctx-tags { display: flex; gap: 5px; margin-top: 8px; }
+    .mini-ctx-tag {
+      font-size: 10px; padding: 2px 7px; border-radius: 4px;
+      background: var(--surface-high); color: var(--text-3);
+      border: 1px solid var(--border-muted);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       HOW IT WORKS
+    ═══════════════════════════════════════════════════════ */
+    .how-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--border-muted);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .how-step {
+      background: var(--surface);
+      padding: 32px 28px;
+      position: relative;
+    }
+    .how-step__number {
+      font-family: var(--font-head);
+      font-size: 11px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .how-step__num-badge {
+      width: 22px; height: 22px; border-radius: 6px;
+      background: var(--accent-dim); border: 1px solid var(--border-accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: var(--accent);
+    }
+    .how-step__title {
+      font-family: var(--font-head);
+      font-size: 17px; font-weight: 700;
+      color: var(--text-1); line-height: 1.25;
+      margin-bottom: 10px;
+    }
+    .how-step__body {
+      font-size: 13.5px; color: var(--text-2); line-height: 1.65;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       STATS
+    ═══════════════════════════════════════════════════════ */
+    .stats-section {
+      padding: 80px 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border-muted);
+      border-bottom: 1px solid var(--border-muted);
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border-muted);
+      border-radius: var(--radius-lg); overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .stat-item {
+      background: var(--surface);
+      padding: 36px 28px;
+      text-align: center;
+    }
+    .stat-item__value {
+      font-family: var(--font-head);
+      font-size: 44px; font-weight: 800;
+      color: var(--text-1); line-height: 1;
+      letter-spacing: -.03em;
+      margin-bottom: 6px;
+    }
+    .stat-item__value span { color: var(--accent); }
+    .stat-item__label {
+      font-size: 13px; color: var(--text-2);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       TESTIMONIALS
+    ═══════════════════════════════════════════════════════ */
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .testimonial-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      display: flex; flex-direction: column;
+    }
+    .testimonial-card__quote {
+      font-size: 14px; color: var(--text-1);
+      line-height: 1.7; flex: 1; margin-bottom: 20px;
+    }
+    .testimonial-card__quote::before { content: '\201C'; }
+    .testimonial-card__quote::after  { content: '\201D'; }
+    .testimonial-card__author {
+      display: flex; align-items: center; gap: 11px;
+    }
+    .testimonial-card__avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head);
+      font-size: 13px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .testimonial-card__name {
+      font-size: 13px; font-weight: 600; color: var(--text-1);
+    }
+    .testimonial-card__role {
+      font-size: 12px; color: var(--text-3);
+    }
+    .testimonial-card__stars {
+      margin-bottom: 14px; color: var(--warn); font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       FAQ
+    ═══════════════════════════════════════════════════════ */
+    .faq-list {
+      max-width: 720px; margin: 0 auto;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .faq-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .faq-question {
+      padding: 18px 22px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer;
+      font-family: var(--font-head);
+      font-size: 15px; font-weight: 600; color: var(--text-1);
+      gap: 16px;
+      user-select: none;
+    }
+    .faq-question:hover { background: var(--surface-el); }
+    .faq-chevron {
+      width: 18px; height: 18px; flex-shrink: 0;
+      color: var(--text-3); transition: transform .22s ease;
+      font-size: 14px; display: flex; align-items: center; justify-content: center;
+    }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+    .faq-answer {
+      max-height: 0; overflow: hidden;
+      transition: max-height .28s ease, padding .28s ease;
+      font-size: 14px; color: var(--text-2);
+      line-height: 1.7;
+      padding: 0 22px;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 400px;
+      padding: 0 22px 18px;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       CTA SECTION
+    ═══════════════════════════════════════════════════════ */
+    .cta-section {
+      padding: 120px 0;
+    }
+    .cta-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 80px 60px;
+      text-align: center;
+      position: relative; overflow: hidden;
+      box-shadow: var(--shadow-float);
+    }
+    .cta-box::before {
+      content: '';
+      position: absolute; top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 600px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .cta-box::after {
+      content: '';
+      position: absolute; top: -120px; left: 50%;
+      transform: translateX(-50%);
+      width: 500px; height: 300px;
+      background: radial-gradient(ellipse, rgba(76,111,255,.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-box__eyebrow { margin-bottom: 20px; }
+    .cta-box__title { margin-bottom: 16px; }
+    .cta-box__sub {
+      max-width: 480px; margin: 0 auto 36px;
+    }
+    .cta-box__actions {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; flex-wrap: wrap;
+    }
+    .cta-box__note { margin-top: 16px; font-size: 12px; color: var(--text-3); }
+
+    /* ═══════════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════════ */
+    .footer {
+      border-top: 1px solid var(--border-muted);
+      padding: 48px 0 40px;
+    }
+    .footer__inner {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 48px;
+      flex-wrap: wrap;
+    }
+    .footer__brand { max-width: 240px; }
+    .footer__brand-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-head);
+      font-size: 16px; font-weight: 700; color: var(--text-1);
+      margin-bottom: 10px;
+    }
+    .footer__brand-logo-icon {
+      width: 26px; height: 26px; background: var(--accent);
+      border-radius: 7px; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; color: #fff;
+    }
+    .footer__brand-desc { font-size: 13px; color: var(--text-3); line-height: 1.6; }
+    .footer__col-title {
+      font-size: 12px; font-weight: 600;
+      color: var(--text-2); margin-bottom: 12px;
+      letter-spacing: .04em;
+    }
+    .footer__links {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .footer__links a {
+      font-size: 13px; color: var(--text-3);
+      transition: color .15s;
+    }
+    .footer__links a:hover { color: var(--text-1); }
+    .footer__bottom {
+      margin-top: 40px; padding-top: 20px;
+      border-top: 1px solid var(--border-muted);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer__bottom-copy { font-size: 12px; color: var(--text-3); }
+    .footer__bottom-links { display: flex; gap: 20px; }
+    .footer__bottom-links a { font-size: 12px; color: var(--text-3); }
+    .footer__bottom-links a:hover { color: var(--text-1); }
+
+    /* ═══════════════════════════════════════════════════════
+       ANIMATIONS
+    ═══════════════════════════════════════════════════════ */
+    .fade-up {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .fade-up-delay-1 { transition-delay: .1s; }
+    .fade-up-delay-2 { transition-delay: .2s; }
+    .fade-up-delay-3 { transition-delay: .3s; }
+
+    /* ─── SPARKLINE SVG ──────────────────────────────────── */
+    .sparkline path { fill: none; stroke-width: 1.5; stroke-linecap: round; }
+
+    /* ─── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width: 960px) {
+      .nav__links { display: none; }
+      .feature-split { grid-template-columns: 1fr; gap: 40px; }
+      .feature-split.reverse .feature-split__visual { order: 0; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .problem-grid { grid-template-columns: 1fr; }
+      .how-grid { grid-template-columns: 1fr; }
+      .mock-panel { display: none; }
+      .mock-sidebar { width: 160px; }
+      .cta-box { padding: 52px 32px; }
+      .footer__inner { gap: 32px; }
+    }
+    @media (max-width: 640px) {
+      .mockup-ui { height: 380px; }
+      .mock-stats { grid-template-columns: repeat(2, 1fr); }
+      .mock-sidebar { display: none; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .hero { padding-top: 60px; }
+      .section { padding: 72px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════
+       NAV
+  ════════════════════════════════════════════════ -->
+  <nav class="nav">
+    <div class="container">
+      <div class="nav__inner">
+        <a href="https://meetory.co" class="nav__logo">
+          <div class="nav__logo-icon">M</div>
+          Meetory
+        </a>
+        <div class="nav__links">
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#testimonials">Reviews</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div class="nav__cta">
+          <a href="https://app.meetory.co" class="btn btn-ghost">Sign in</a>
+          <a href="https://app.meetory.co" class="btn btn-primary">Open workspace →</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════════════════
+       HERO
+  ════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero__text fade-up">
+        <div class="hero__eyebrow">
+          <div class="hero__eyebrow-line"></div>
+          <span class="badge badge-accent">
+            <span class="dot dot-accent"></span>
+            AI-powered meeting workspace
+          </span>
+          <div class="hero__eyebrow-line"></div>
+        </div>
+        <h1 class="display hero__headline">
+          Meetings that end<br>
+          with <em>clear outcomes</em>
+        </h1>
+        <p class="lead hero__sub">
+          Meetory captures what was said, decided, and assigned — then keeps your team moving without follow-up chaos.
+        </p>
+        <div class="hero__actions">
+          <a href="https://app.meetory.co" class="btn btn-primary btn-xl">
+            Start for free
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#how-it-works" class="btn btn-secondary btn-xl">See how it works</a>
+        </div>
+        <p class="hero__note">Free to start · No credit card · <span>Teams ship faster with Meetory</span></p>
+      </div>
+    </div>
+
+    <div class="hero__visual container--wide fade-up fade-up-delay-1">
+      <div class="hero__visual-glow"></div>
+      <div class="mockup-wrap">
+        <div class="mockup-bar">
+          <div class="mockup-bar__dot"></div>
+          <div class="mockup-bar__dot"></div>
+          <div class="mockup-bar__dot"></div>
+          <div class="mockup-bar__url">
+            <div class="mockup-bar__urlpill">app.meetory.co</div>
+          </div>
+        </div>
+        <div class="mockup-ui">
+
+          <!-- Sidebar -->
+          <div class="mock-sidebar">
+            <div class="mock-sidebar__logo">
+              <div class="mock-sidebar__logo-icon">M</div>
+              <span class="mock-sidebar__logo-name">Meetory</span>
+            </div>
+
+            <div class="mock-nav-item active">
+              <svg class="mock-nav-item__icon" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor" opacity=".7"/><rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor" opacity=".7"/><rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor" opacity=".7"/><rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor" opacity=".7"/></svg>
+              Workspace
+            </div>
+            <div class="mock-nav-item">
+              <svg class="mock-nav-item__icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M7 4v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Meetings
+              <span class="mock-nav-item__badge">12</span>
+            </div>
+            <div class="mock-nav-item">
+              <svg class="mock-nav-item__icon" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 6h12" stroke="currentColor" stroke-width="1.2"/><path d="M4 1v4M10 1v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Tasks
+              <span class="mock-nav-item__badge">28</span>
+            </div>
+            <div class="mock-nav-item">
+              <svg class="mock-nav-item__icon" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.5 3.5H12L9.5 6.8l1 3.7L7 8.5l-3.5 2 1-3.7L2 4.5h3.5L7 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+              Calendar
+            </div>
+            <div class="mock-nav-item">
+              <svg class="mock-nav-item__icon" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Search
+            </div>
+
+            <div class="mock-section-title">Pinned</div>
+
+            <div class="mock-person">
+              <div class="mock-avatar" style="background:#6366F1;">ZH</div>
+              <div class="mock-person-info">
+                <div class="mock-person-name">Zheka</div>
+                <div class="mock-person-status" style="color:#F59E0B; font-size:9.5px;">● В работе · Q2</div>
+              </div>
+              <div style="display:flex;gap:3px;margin-left:auto;">
+                <div style="background:rgba(76,111,255,.15);color:#8FA8FF;font-size:9px;padding:1px 5px;border-radius:3px;border:1px solid rgba(76,111,255,.2);">4</div>
+                <div style="background:rgba(244,63,94,.12);color:#F87171;font-size:9px;padding:1px 5px;border-radius:3px;">2</div>
+              </div>
+            </div>
+            <div class="mock-person">
+              <div class="mock-avatar" style="background:#F59E0B;">RO</div>
+              <div class="mock-person-info">
+                <div class="mock-person-name">Roma</div>
+                <div class="mock-person-status">На встрече</div>
+              </div>
+              <div style="background:rgba(76,111,255,.15);color:#8FA8FF;font-size:9px;padding:1px 5px;border-radius:3px;border:1px solid rgba(76,111,255,.2);margin-left:auto;">7</div>
+            </div>
+            <div class="mock-person">
+              <div class="mock-avatar" style="background:#22C55E;">GU</div>
+              <div class="mock-person-info">
+                <div class="mock-person-name">Gurban</div>
+                <div class="mock-person-status" style="color:#22C55E;font-size:9.5px;">● Онлайн</div>
+              </div>
+            </div>
+
+            <div class="mock-section-title" style="margin-top:4px;">Встречи</div>
+            <div class="mock-meeting-pill">
+              <div class="mock-meeting-dot" style="background:#4C6FFF;"></div>
+              <span class="mock-meeting-name">Q2 Planning</span>
+              <span class="mock-meeting-badge" style="color:#22C55E;font-size:9.5px;">today</span>
+            </div>
+            <div class="mock-meeting-pill">
+              <div class="mock-meeting-dot" style="background:#F59E0B;"></div>
+              <span class="mock-meeting-name">Product Sync</span>
+              <span class="mock-meeting-badge">thu</span>
+            </div>
+            <div class="mock-meeting-pill">
+              <div class="mock-meeting-dot" style="background:#22C55E;"></div>
+              <span class="mock-meeting-name">Marketing Sync</span>
+              <span class="mock-meeting-badge">fri</span>
+            </div>
+            <div class="mock-meeting-pill">
+              <div class="mock-meeting-dot" style="background:#8B5CF6;"></div>
+              <span class="mock-meeting-name">Design Review</span>
+              <span class="mock-meeting-badge">mon</span>
+            </div>
+
+            <div class="mock-sidebar__bottom">
+              <div class="mock-plan-card">
+                <div class="mock-plan-label">
+                  <span>+ Starter plan</span>
+                  <span class="mock-plan-badge">TRIAL</span>
+                </div>
+                <div class="mock-progress-track">
+                  <div class="mock-progress-fill" style="width:64%;"></div>
+                </div>
+                <div class="mock-plan-usage">12 / 20 h used</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main content -->
+          <div class="mock-main">
+            <div class="mock-topbar">
+              <div class="mock-search">
+                <span class="mock-search-icon">⌕</span>
+                <span>Search meetings, tasks, people…</span>
+                <span class="mock-kbd">⌘K</span>
+              </div>
+              <div class="mock-topbar-icon" style="margin-left:auto;">🔔</div>
+              <div class="mock-new-btn">
+                <span>+</span> New meeting
+              </div>
+              <div class="mock-user-avatar">SA</div>
+            </div>
+
+            <div class="mock-content">
+              <div class="mock-greeting">
+                <div class="mock-greeting-text">
+                  <div class="mock-greeting-title">Good morning, Sarah 👋</div>
+                  <div class="mock-greeting-sub">Here's what's happening with your work today.</div>
+                </div>
+                <div class="mock-date-badge">
+                  <span>📅</span> Thu, Apr 24
+                </div>
+              </div>
+
+              <!-- Stat cards -->
+              <div class="mock-stats">
+                <div class="mock-stat-card warn">
+                  <div class="mock-stat-header">
+                    <div class="mock-stat-label" style="color:var(--warn);">⚠ Requires Attention</div>
+                    <span style="font-size:11px;">⚠️</span>
+                  </div>
+                  <div class="mock-stat-warn-items">
+                    <div class="mock-stat-warn-item"><span class="mock-stat-warn-num">3</span> tasks are overdue</div>
+                    <div class="mock-stat-warn-item"><span class="mock-stat-warn-num">2</span> tasks without owner</div>
+                    <div class="mock-stat-warn-item"><span class="mock-stat-warn-num">1</span> critical risk identified</div>
+                    <div class="mock-stat-warn-item" style="color:var(--accent);">✦ New AI findings to review</div>
+                  </div>
+                </div>
+                <div class="mock-stat-card">
+                  <div class="mock-stat-header">
+                    <div class="mock-stat-label">Tasks</div>
+                    <span class="mock-stat-icon">☐</span>
+                  </div>
+                  <div class="mock-stat-value">28 <span>+6 new</span></div>
+                  <div class="mock-stat-sub">12 in progress · 11 todo · 5 done</div>
+                  <svg class="mockup-sparkline" viewBox="0 0 100 28" preserveAspectRatio="none">
+                    <path d="M0,22 C10,18 20,24 30,16 C40,8 50,20 60,14 C70,8 80,16 90,10 L100,8" stroke="#4C6FFF" class="sparkline path"/>
+                  </svg>
+                </div>
+                <div class="mock-stat-card">
+                  <div class="mock-stat-header">
+                    <div class="mock-stat-label">Meetings</div>
+                    <span class="mock-stat-icon">↓</span>
+                  </div>
+                  <div class="mock-stat-value">4</div>
+                  <div class="mock-stat-sub">1 live · 2 scheduled · 1 done</div>
+                  <svg class="mockup-sparkline" viewBox="0 0 100 28" preserveAspectRatio="none">
+                    <path d="M0,20 C15,22 25,10 40,16 C55,22 65,8 80,12 L100,6" stroke="#22C55E" class="sparkline path"/>
+                  </svg>
+                </div>
+                <div class="mock-stat-card">
+                  <div class="mock-stat-header">
+                    <div class="mock-stat-label" style="color:var(--danger);">Risks</div>
+                    <span class="mock-stat-icon">△</span>
+                  </div>
+                  <div class="mock-stat-value" style="color:var(--danger);">5 <span style="font-size:12px;color:var(--warn);">1 critical</span></div>
+                  <div class="mock-stat-sub">2 blockers · 3 monitoring</div>
+                  <svg class="mockup-sparkline" viewBox="0 0 100 28" preserveAspectRatio="none">
+                    <path d="M0,14 C10,10 20,20 35,12 C50,4 60,18 75,10 L100,14" stroke="#F43F5E" class="sparkline path"/>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Tasks table -->
+              <div class="mock-work-section">
+                <div class="mock-work-header">
+                  <span class="mock-work-title">My Work</span>
+                  <span class="mock-work-count">14 tasks · Sorted by due</span>
+                </div>
+                <div class="mock-tabs">
+                  <div class="mock-tab active">Assigned to me <span class="num">14</span></div>
+                  <div class="mock-tab">Due today <span class="num">4</span></div>
+                  <div class="mock-tab">Due this week <span class="num">9</span></div>
+                  <div class="mock-tab">No owner <span class="num">2</span></div>
+                </div>
+                <div class="mock-table-head">
+                  <div>Task</div><div>Meeting</div><div>Priority</div><div>Due date</div><div>Status</div><div></div>
+                </div>
+                <div class="mock-row active">
+                  <div class="mock-row-task active">Extract rate-limit middleware into shared package</div>
+                  <div class="mock-row-meeting"><div class="mock-row-dot" style="background:#4C6FFF;border-radius:2px;"></div>Q2 Planning</div>
+                  <div class="mock-row-priority"><div class="dot dot-danger"></div><span style="color:#F87171;">High</span></div>
+                  <div class="mock-row-date">Apr 28</div>
+                  <div><span class="mock-status-pill status-inprogress">In progress</span></div>
+                  <div class="mock-row-more">···</div>
+                </div>
+                <div class="mock-row">
+                  <div class="mock-row-task">Confirm payment-provider SLA before Billing v2</div>
+                  <div class="mock-row-meeting"><div class="mock-row-dot" style="background:#4C6FFF;border-radius:2px;"></div>Q2 Planning</div>
+                  <div class="mock-row-priority"><div class="dot dot-danger"></div><span style="color:#F87171;">Urgent</span></div>
+                  <div class="mock-row-date overdue">Apr 22</div>
+                  <div><span class="mock-status-pill status-blocked">Blocked</span></div>
+                  <div class="mock-row-more">···</div>
+                </div>
+                <div class="mock-row">
+                  <div class="mock-row-task">Draft enterprise comms for bug-842</div>
+                  <div class="mock-row-meeting"><div class="mock-row-dot" style="background:#F59E0B;border-radius:2px;"></div>Product Sync</div>
+                  <div class="mock-row-priority"><div class="dot dot-danger"></div><span style="color:#F87171;">Urgent</span></div>
+                  <div class="mock-row-date">Apr 25</div>
+                  <div><span class="mock-status-pill status-todo">To do</span></div>
+                  <div class="mock-row-more">···</div>
+                </div>
+                <div class="mock-row">
+                  <div class="mock-row-task">Update onboarding copy for new nav</div>
+                  <div class="mock-row-meeting"><div class="mock-row-dot" style="background:#8B5CF6;border-radius:2px;"></div>Design Review</div>
+                  <div class="mock-row-priority"><div class="dot dot-warn"></div><span style="color:var(--warn);">Medium</span></div>
+                  <div class="mock-row-date">May 02</div>
+                  <div><span class="mock-status-pill status-inprogress">In progress</span></div>
+                  <div class="mock-row-more">···</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right panel -->
+          <div class="mock-panel">
+            <div class="mock-panel-header">
+              <div>
+                <div class="mock-panel-id">TSK-204</div>
+                <div class="mock-panel-title">Extract rate-limit middleware into shared package</div>
+                <div class="mock-panel-tags">
+                  <span class="mock-panel-tag accent">In progress</span>
+                  <span class="mock-panel-tag warn">High priority</span>
+                  <span class="mock-panel-tag">Engineering</span>
+                </div>
+              </div>
+            </div>
+            <div class="mock-panel-body">
+              <div class="mock-props-section">
+                <div class="mock-props-title">Properties</div>
+                <div class="mock-prop">
+                  <span class="mock-prop-key">Owner</span>
+                  <span class="mock-prop-val">
+                    <div class="mock-prop-avatar" style="background:#6366F1;">AK</div> Anna K.
+                  </span>
+                </div>
+                <div class="mock-prop">
+                  <span class="mock-prop-key">Due</span>
+                  <span class="mock-prop-val mock-prop-date-warn">Apr 28 · in 4 days</span>
+                </div>
+                <div class="mock-prop">
+                  <span class="mock-prop-key">Meeting</span>
+                  <span class="mock-prop-val"><div style="width:8px;height:8px;border-radius:2px;background:#4C6FFF;"></div> Q2 Planning</span>
+                </div>
+                <div class="mock-prop">
+                  <span class="mock-prop-key">Labels</span>
+                  <span class="mock-prop-val">
+                    <span class="mock-panel-tag" style="padding:1px 6px;font-size:9.5px;">backend</span>
+                    <span class="mock-panel-tag" style="padding:1px 6px;font-size:9.5px;">refactor</span>
+                  </span>
+                </div>
+                <div class="mock-prop">
+                  <span class="mock-prop-key">Depends on</span>
+                  <span class="mock-prop-val" style="color:var(--accent);">TSK-198</span>
+                </div>
+              </div>
+
+              <div class="mock-ai-card">
+                <div class="mock-ai-header">
+                  <div class="mock-ai-icon">✦</div>
+                  <div>
+                    <div class="mock-ai-label">Captured by Meetory AI</div>
+                    <div class="mock-ai-from">from Q2 Planning · 00:34:12</div>
+                  </div>
+                </div>
+                <div class="mock-ai-quote">
+                  "…we need to extract this rate-limit out, it's already used in three places — let's have Anna own it before Billing v2 lands."
+                </div>
+                <div class="mock-ai-attribution">— Zheka · Q2 Planning, 00:34:12</div>
+              </div>
+
+              <div class="mock-activity">
+                <div class="mock-props-title">Activity</div>
+                <div class="mock-activity-item">
+                  <div class="mock-act-avatar" style="background:var(--accent);">✦</div>
+                  <div class="mock-act-text">Meetory AI created this task <span class="mock-act-time">· 14m</span></div>
+                </div>
+                <div class="mock-activity-item">
+                  <div class="mock-act-avatar" style="background:#6366F1;">AK</div>
+                  <div class="mock-act-text">Anna K. accepted the task <span class="mock-act-time">· 10m</span></div>
+                </div>
+                <div class="mock-activity-item">
+                  <div class="mock-act-avatar" style="background:#22C55E;">IP</div>
+                  <div class="mock-act-text">Sarah linked TSK-198 <span class="mock-act-time">· 6m</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       LOGOS
+  ════════════════════════════════════════════════ -->
+  <section class="logos-section">
+    <div class="container">
+      <div class="logos-section__label">Trusted by product and engineering teams</div>
+      <div class="logos-track">
+        <div class="logos-track__logo">Vercel</div>
+        <div class="logos-track__logo">Linear</div>
+        <div class="logos-track__logo">Retool</div>
+        <div class="logos-track__logo">Notion</div>
+        <div class="logos-track__logo">Loom</div>
+        <div class="logos-track__logo">Figma</div>
+        <div class="logos-track__logo">Stripe</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       PROBLEM
+  ════════════════════════════════════════════════ -->
+  <section class="section" style="padding-bottom: 0;">
+    <div class="container">
+      <div class="section__header fade-up">
+        <div class="label">The problem</div>
+        <h2 class="h2">Meetings happen. Outcomes disappear.</h2>
+        <p class="lead">Without structure, every meeting leaves a trail of Slack threads, forgotten decisions, and tasks no one owns.</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card fade-up">
+          <div class="problem-card__icon">📝</div>
+          <div class="problem-card__title">Notes scattered everywhere</div>
+          <div class="problem-card__body">Notion pages, Slack messages, email summaries — no single record of what was actually decided.</div>
+        </div>
+        <div class="problem-card fade-up fade-up-delay-1">
+          <div class="problem-card__icon">🎯</div>
+          <div class="problem-card__title">Action items that vanish</div>
+          <div class="problem-card__body">Someone says "I'll take that." Two weeks later, it never happened. No owner, no due date, no record.</div>
+        </div>
+        <div class="problem-card fade-up fade-up-delay-2">
+          <div class="problem-card__icon">🔍</div>
+          <div class="problem-card__title">No institutional memory</div>
+          <div class="problem-card__body">New teammates ask "why did we do this?" Nobody knows. The context lived in a meeting six months ago.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       FEATURES
+  ════════════════════════════════════════════════ -->
+  <section class="section" id="features">
+    <div class="container">
+
+      <!-- Feature 1 -->
+      <div class="feature-split fade-up">
+        <div class="feature-split__text">
+          <div class="label feature-split__label">Instant clarity</div>
+          <h2 class="h2 feature-split__h">Every meeting becomes a structured record</h2>
+          <p class="feature-split__body">Meetory AI listens, then surfaces summaries, key decisions, and risks the moment your call ends. No manual write-up. No ambiguity.</p>
+          <div class="feature-list">
+            <div class="feature-list__item">
+              <div class="feature-list__check">✓</div>
+              <span>AI-written summary in seconds after each meeting</span>
+            </div>
+            <div class="feature-list__item">
+              <div class="feature-list__check">✓</div>
+              <span>Decisions and risks flagged automatically</span>
+            </div>
+            <div class="feature-list__item">
+              <div class="feature-list__check">✓</div>
+              <span>Exact quote capture so context is never lost</span>
+            </div>
+          </div>
+        </div>
+        <div class="feature-split__visual">
+          <div style="font-size:10.5px;color:var(--text-3);font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px;">Q2 Planning · 48min · Today 10:00</div>
+          <div class="mini-meeting-card">
+            <div class="mini-meeting-header">
+              <div class="mini-meeting-title">Q2 Planning</div>
+              <div class="mini-meeting-meta">
+                <span>48min</span>
+                <span>Today</span>
+              </div>
+            </div>
+            <div class="mini-badges">
+              <span class="mini-badge mini-badge-tasks">8 tasks</span>
+              <span class="mini-badge mini-badge-dec">3 decisions</span>
+              <span class="mini-badge mini-badge-risk">2 risks</span>
+            </div>
+            <div class="mini-ai-summary">
+              Team aligned on shipping Billing v2 before EOQ. Rate-limit extraction assigned to Anna. SLA confirmation with payment provider flagged as a blocker.
+            </div>
+          </div>
+          <div class="mini-meeting-card">
+            <div class="mini-meeting-header">
+              <div class="mini-meeting-title">Product Sync</div>
+              <div class="mini-meeting-meta"><span>32min</span><span>Yesterday</span></div>
+            </div>
+            <div class="mini-badges">
+              <span class="mini-badge mini-badge-tasks">5 tasks</span>
+              <span class="mini-badge mini-badge-dec">2 decisions</span>
+            </div>
+            <div class="mini-ai-summary">
+              Onboarding funnel redesign greenlit. Design Review scheduled for Monday. Copy update delegated to Sarah.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-split reverse fade-up">
+        <div class="feature-split__text">
+          <div class="label feature-split__label">Follow-through</div>
+          <h2 class="h2 feature-split__h">Action items with owners, dates, and accountability</h2>
+          <p class="feature-split__body">Tasks created from meetings aren't just notes — they're tracked items with owners and due dates, visible across your whole team.</p>
+          <div class="feature-list">
+            <div class="feature-list__item">
+              <div class="feature-list__check">✓</div>
+              <span>Tasks auto-extracted from meeting transcripts</span>
+            </div>
+            <div class="feature-list__item">
+              <div class="feature-list__check">✓</div>
+              <span>Assign owners instantly, with due dates attached</span>
+            </div>
+            <div class="feature-list__item">
+              <div class="feature-list__check">✓</div>
+              <span>Overdue and blocked items surfaced proactively</span>
+            </div>
+          </div>
+        </div>
+        <div class="feature-split__visual">
+          <div style="font-size:10.5px;color:var(--text-3);font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px;">From this meeting · Q2 Planning</div>
+          <div class="mini-action-list">
+            <div class="mini-action-item">
+              <div class="mini-action-check done">✓</div>
+              <span>Extract rate-limit middleware into shared package</span>
+              <div class="mini-action-owner" style="background:#6366F1;">AK</div>
+              <span class="mini-action-due">Apr 28</span>
+            </div>
+            <div class="mini-action-item">
+              <div class="mini-action-check"></div>
+              <span>Confirm payment-provider SLA before Billing v2</span>
+              <div class="mini-action-owner" style="background:#F59E0B;">RO</div>
+              <span class="mini-action-due" style="color:var(--danger);">Apr 22</span>
+            </div>
+            <div class="mini-action-item">
+              <div class="mini-action-check"></div>
+              <span>Draft enterprise comms for bug-842</span>
+              <div class="mini-action-owner" style="background:#22C55E;">GU</div>
+              <span class="mini-action-due">Apr 25</span>
+            </div>
+            <div class="mini-action-item">
+              <div class="mini-action-check"></div>
+              <span>Update onboarding copy for new nav</span>
+              <div class="mini-action-owner" style="background:#EC4899;">SA</div>
+              <span class="mini-action-due">May 02</span>
+            </div>
+            <div class="mini-action-item">
+              <div class="mini-action-check done">✓</div>
+              <span>Collect retention metrics for Q1 analysis</span>
+              <div class="mini-action-owner" style="background:#8B5CF6;">VI</div>
+              <span class="mini-action-due">Apr 23</span>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding:10px 12px;background:var(--warn-dim);border:1px solid rgba(245,158,11,.2);border-radius:7px;">
+            <div style="font-size:11px;color:var(--warn);font-weight:600;margin-bottom:3px;">⚠ 2 tasks require attention</div>
+            <div style="font-size:11px;color:var(--text-2);">1 overdue · 1 without owner · Review now →</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-split fade-up">
+        <div class="feature-split__text">
+          <div class="label feature-split__label">Institutional memory</div>
+          <h2 class="h2 feature-split__h">Search across every meeting, ever</h2>
+          <p class="feature-split__body">Find any decision, quote, or task from any meeting, instantly. Meetory is your team's searchable record of everything that's ever been decided.</p>
+          <div class="feature-list">
+            <div class="feature-list__item">
+              <div class="feature-list__check">✓</div>
+              <span>Full-text search across transcripts, summaries, tasks</span>
+            </div>
+            <div class="feature-list__item">
+              <div class="feature-list__check">✓</div>
+              <span>Filter by person, meeting, date, or topic</span>
+            </div>
+            <div class="feature-list__item">
+              <div class="feature-list__check">✓</div>
+              <span>Link tasks back to the exact meeting moment</span>
+            </div>
+          </div>
+        </div>
+        <div class="feature-split__visual">
+          <div class="mini-search-bar">
+            <span class="mini-search-icon">⌕</span>
+            <span class="mini-search-text">billing v2 decision</span>
+            <span class="mini-search-kbd">⌘K</span>
+          </div>
+          <div style="font-size:10.5px;color:var(--text-3);margin-bottom:8px;">3 results across 2 meetings</div>
+          <div class="mini-search-result highlighted">
+            <div class="mini-result-header">
+              <span class="mini-result-icon">📋</span>
+              <span class="mini-result-title">Q2 Planning · Decision</span>
+              <span class="mini-result-date">Today</span>
+            </div>
+            <div class="mini-result-snippet">"Ship <span class="mini-result-highlight">Billing v2</span> before EOQ. Rate-limit dependency must be resolved first."</div>
+          </div>
+          <div class="mini-search-result">
+            <div class="mini-result-header">
+              <span class="mini-result-icon">☐</span>
+              <span class="mini-result-title">Product Sync · Task</span>
+              <span class="mini-result-date">2 days ago</span>
+            </div>
+            <div class="mini-result-snippet">Confirm payment-provider SLA before <span class="mini-result-highlight">Billing v2</span> goes live — assigned to Roma.</div>
+          </div>
+          <div class="mini-search-result">
+            <div class="mini-result-header">
+              <span class="mini-result-icon">⚡</span>
+              <span class="mini-result-title">Engineering Standup · Risk</span>
+              <span class="mini-result-date">1 week ago</span>
+            </div>
+            <div class="mini-result-snippet"><span class="mini-result-highlight">Billing v2</span> flagged as high-risk without middleware extraction — see TSK-198.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="feature-split reverse fade-up">
+        <div class="feature-split__text">
+          <div class="label feature-split__label">Team visibility</div>
+          <h2 class="h2 feature-split__h">Context without being in the room</h2>
+          <p class="feature-split__body">See what your teammates decided, what they're blocked on, and what's coming — without needing to attend every meeting.</p>
+          <div class="feature-list">
+            <div class="feature-list__item">
+              <div class="feature-list__check">✓</div>
+              <span>Per-person work summaries across all meetings</span>
+            </div>
+            <div class="feature-list__item">
+              <div class="feature-list__check">✓</div>
+              <span>Visibility into blockers and priorities across the team</span>
+            </div>
+            <div class="feature-list__item">
+              <div class="feature-list__check">✓</div>
+              <span>Coming up, at risk, and awaiting review — all in one view</span>
+            </div>
+          </div>
+        </div>
+        <div class="feature-split__visual">
+          <div class="mini-context-card">
+            <div class="mini-ctx-header">
+              <div class="mini-ctx-icon">👤</div>
+              <div>
+                <div class="mini-ctx-name">Anna K. · Engineering</div>
+                <div class="mini-ctx-sub">Last active in Q2 Planning · 14min ago</div>
+              </div>
+            </div>
+            <div class="mini-ctx-body">Working on rate-limit extraction (TSK-204, due Apr 28). Accepted task from Q2 Planning. Depends on TSK-198 being merged first.</div>
+            <div class="mini-ctx-tags">
+              <span class="mini-ctx-tag">backend</span>
+              <span class="mini-ctx-tag">high priority</span>
+              <span class="mini-ctx-tag">in progress</span>
+            </div>
+          </div>
+          <div class="mini-context-card">
+            <div class="mini-ctx-header">
+              <div class="mini-ctx-icon" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.25);">👤</div>
+              <div>
+                <div class="mini-ctx-name">Roma · Product</div>
+                <div class="mini-ctx-sub">На встрече · Product Sync right now</div>
+              </div>
+            </div>
+            <div class="mini-ctx-body">Overdue task: SLA confirmation with payment provider (Apr 22). Meeting context suggests blocker is external — follow up needed.</div>
+            <div class="mini-ctx-tags">
+              <span class="mini-ctx-tag" style="color:var(--danger);border-color:rgba(244,63,94,.2);">overdue</span>
+              <span class="mini-ctx-tag" style="color:var(--warn);border-color:rgba(245,158,11,.2);">blocked</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       HOW IT WORKS
+  ════════════════════════════════════════════════ -->
+  <section class="section--tight" id="how-it-works" style="background:var(--bg-subtle);border-top:1px solid var(--border-muted);border-bottom:1px solid var(--border-muted);">
+    <div class="container">
+      <div class="section__header fade-up">
+        <div class="label">How it works</div>
+        <h2 class="h2">From meeting to outcomes in three steps</h2>
+      </div>
+      <div class="how-grid fade-up">
+        <div class="how-step">
+          <div class="how-step__number">
+            <div class="how-step__num-badge">1</div>
+            Connect
+          </div>
+          <div class="how-step__title">Run your meeting normally</div>
+          <div class="how-step__body">Connect your calendar or invite the Meetory bot. No recording setup, no manual notes, no workflow changes. Your meetings stay unchanged.</div>
+        </div>
+        <div class="how-step" style="border-left:1px solid var(--border-muted);">
+          <div class="how-step__number">
+            <div class="how-step__num-badge">2</div>
+            Capture
+          </div>
+          <div class="how-step__title">AI extracts what matters</div>
+          <div class="how-step__body">The moment your call ends, Meetory produces a structured summary: decisions made, tasks assigned, risks flagged, and key context preserved.</div>
+        </div>
+        <div class="how-step" style="border-left:1px solid var(--border-muted);">
+          <div class="how-step__number">
+            <div class="how-step__num-badge">3</div>
+            Execute
+          </div>
+          <div class="how-step__title">Your team keeps moving</div>
+          <div class="how-step__body">Tasks are assigned, owners notified, and progress tracked — all in one workspace. No follow-up Slack, no status theater. Just execution.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       STATS
+  ════════════════════════════════════════════════ -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid fade-up">
+        <div class="stat-item">
+          <div class="stat-item__value">3<span>×</span></div>
+          <div class="stat-item__label">faster task follow-through</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-item__value">90<span>%</span></div>
+          <div class="stat-item__label">less time writing meeting notes</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-item__value">12<span>k+</span></div>
+          <div class="stat-item__label">meetings processed every week</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-item__value"><span>&lt;</span>60<span>s</span></div>
+          <div class="stat-item__label">to a full structured summary</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       MID-PAGE CTA
+  ════════════════════════════════════════════════ -->
+  <section style="padding:72px 0;border-bottom:1px solid var(--border-muted);">
+    <div class="container" style="text-align:center;">
+      <p class="lead fade-up" style="margin-bottom:24px;font-size:18px;color:var(--text-1);">Your next meeting could be the last one with no clear outcome.</p>
+      <a href="https://app.meetory.co" class="btn btn-primary btn-xl fade-up fade-up-delay-1">Open Meetory for free →</a>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       TESTIMONIALS
+  ════════════════════════════════════════════════ -->
+  <section class="section" id="testimonials">
+    <div class="container">
+      <div class="section__header fade-up">
+        <div class="label">From the teams</div>
+        <h2 class="h2">Built for teams who actually ship</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card fade-up">
+          <div class="testimonial-card__stars">★★★★★</div>
+          <p class="testimonial-card__quote">We were losing action items in Slack threads after every sprint meeting. Meetory just… fixed that. Every task lands with an owner and a date. No more chasing.</p>
+          <div class="testimonial-card__author">
+            <div class="testimonial-card__avatar" style="background:#4C6FFF;">MR</div>
+            <div>
+              <div class="testimonial-card__name">Marcus R.</div>
+              <div class="testimonial-card__role">VP Engineering · Series B startup</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card fade-up fade-up-delay-1">
+          <div class="testimonial-card__stars">★★★★★</div>
+          <p class="testimonial-card__quote">The search alone is worth it. A new team member asked why we made a certain product decision — I found the exact meeting, the exact quote, in about 15 seconds.</p>
+          <div class="testimonial-card__author">
+            <div class="testimonial-card__avatar" style="background:#22C55E;">TS</div>
+            <div>
+              <div class="testimonial-card__name">Tanya S.</div>
+              <div class="testimonial-card__role">Product Lead · B2B SaaS</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card fade-up fade-up-delay-2">
+          <div class="testimonial-card__stars">★★★★★</div>
+          <p class="testimonial-card__quote">Our Friday standups used to start with "what did we decide last week?" Now everyone opens Meetory. It's genuinely changed how our team operates.</p>
+          <div class="testimonial-card__author">
+            <div class="testimonial-card__avatar" style="background:#F59E0B;">DK</div>
+            <div>
+              <div class="testimonial-card__name">Daniel K.</div>
+              <div class="testimonial-card__role">Co-founder · Seed-stage</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       FAQ
+  ════════════════════════════════════════════════ -->
+  <section class="section--tight" id="faq" style="background:var(--bg-subtle);border-top:1px solid var(--border-muted);border-bottom:1px solid var(--border-muted);">
+    <div class="container">
+      <div class="section__header fade-up">
+        <div class="label">FAQ</div>
+        <h2 class="h2">Common questions</h2>
+      </div>
+      <div class="faq-list fade-up">
+        <div class="faq-item open">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            How does Meetory capture my meetings?
+            <div class="faq-chevron">▾</div>
+          </div>
+          <div class="faq-answer">Meetory connects to your calendar and integrates with tools like Google Meet, Zoom, and Teams. You can also invite the Meetory bot to any call. Audio is processed securely and transcripts are stored only in your workspace. Nothing is shared externally.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Do I need to change how I run my meetings?
+            <div class="faq-chevron">▾</div>
+          </div>
+          <div class="faq-answer">No. Meetory works passively in the background. Run your meetings exactly as you do today. The AI extracts structure after the call — you just review and act on what it surfaces.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            How accurate are the AI summaries and task extractions?
+            <div class="faq-chevron">▾</div>
+          </div>
+          <div class="faq-answer">Very high accuracy for clear spoken commitments and decisions. For ambiguous items, Meetory surfaces them for human review rather than auto-creating tasks. You stay in control — the AI reduces noise, you make the calls.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Who can see my meeting data?
+            <div class="faq-chevron">▾</div>
+          </div>
+          <div class="faq-answer">Your data lives in your workspace and is accessible only to members you invite. Meetory does not use your meeting content to train AI models. Enterprise plans offer SSO, audit logs, and custom data residency.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Does Meetory integrate with our existing tools?
+            <div class="faq-chevron">▾</div>
+          </div>
+          <div class="faq-answer">Yes. Meetory integrates with Linear, Jira, Notion, Slack, Google Calendar, Outlook, Zoom, Google Meet, and Microsoft Teams. API access is available on Pro and above for custom integrations.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Is there a free plan?
+            <div class="faq-chevron">▾</div>
+          </div>
+          <div class="faq-answer">Yes. The Starter plan is free and includes up to 20 hours of meeting processing per month, full task tracking, and search. Paid plans unlock unlimited meetings, team features, integrations, and advanced AI capabilities.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       FINAL CTA
+  ════════════════════════════════════════════════ -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-box fade-up">
+        <div class="cta-box__eyebrow">
+          <span class="badge badge-accent">
+            <span class="dot dot-accent"></span>
+            Start free today
+          </span>
+        </div>
+        <h2 class="display cta-box__title">
+          Stop losing your<br>meeting outcomes
+        </h2>
+        <p class="lead cta-box__sub">
+          Every decision your team makes deserves to be captured, assigned, and executed. Meetory makes that automatic.
+        </p>
+        <div class="cta-box__actions">
+          <a href="https://app.meetory.co" class="btn btn-primary btn-xl">
+            Open Meetory — it's free
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="https://app.meetory.co/demo" class="btn btn-secondary btn-xl">Watch a demo</a>
+        </div>
+        <p class="cta-box__note">Free plan · No credit card · Takes 2 minutes to set up</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__inner">
+        <div class="footer__brand">
+          <div class="footer__brand-logo">
+            <div class="footer__brand-logo-icon">M</div>
+            Meetory
+          </div>
+          <p class="footer__brand-desc">AI meeting workspace that turns conversations into clear, actionable outcomes for your whole team.</p>
+        </div>
+        <div>
+          <div class="footer__col-title">Product</div>
+          <div class="footer__links">
+            <a href="https://app.meetory.co">Workspace</a>
+            <a href="https://app.meetory.co">Meetings</a>
+            <a href="https://app.meetory.co">Tasks</a>
+            <a href="https://app.meetory.co">Search</a>
+            <a href="https://app.meetory.co">Integrations</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__col-title">Company</div>
+          <div class="footer__links">
+            <a href="#">About</a>
+            <a href="#">Blog</a>
+            <a href="#">Changelog</a>
+            <a href="#">Careers</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__col-title">Support</div>
+          <div class="footer__links">
+            <a href="#">Documentation</a>
+            <a href="#">Status</a>
+            <a href="#">Contact us</a>
+            <a href="#">Privacy policy</a>
+            <a href="#">Terms</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span class="footer__bottom-copy">© 2025 Meetory. All rights reserved.</span>
+        <div class="footer__bottom-links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Security</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ── FAQ toggle
+    function toggleFaq(el) {
+      const item = el.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+
+    // ── Fade-up on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
