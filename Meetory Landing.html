@@ -1,0 +1,3273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Meetory — AI meeting workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #0b0e1c;
+    --bg-1: #11142a;
+    --bg-2: #161a33;
+    --bg-3: #1c2140;
+    --bg-4: #20264a;
+
+    --border: #242a48;
+    --border-soft: #1c2040;
+    --border-strong: #2d3358;
+
+    --text-0: #eef0fa;
+    --text-1: #c9cce0;
+    --text-2: #8b8fab;
+    --text-3: #5f6488;
+    --text-4: #3e4365;
+
+    --indigo: #5b6cf5;
+    --indigo-2: #6878ff;
+    --indigo-bg: rgba(91, 108, 245, 0.14);
+    --indigo-border: rgba(91, 108, 245, 0.35);
+
+    --orange: #f59e3c;
+    --orange-bg: rgba(245, 158, 60, 0.13);
+    --orange-text: #f5b56b;
+
+    --green: #4ade80;
+    --green-bg: rgba(74, 222, 128, 0.13);
+    --green-text: #7ce5a3;
+
+    --red: #f47272;
+    --red-bg: rgba(244, 114, 114, 0.13);
+    --red-text: #f59595;
+
+    --yellow: #f7c948;
+    --yellow-bg: rgba(247, 201, 72, 0.13);
+    --yellow-text: #f7d775;
+
+    --blue: #5fa8ff;
+    --blue-bg: rgba(95, 168, 255, 0.13);
+    --blue-text: #8fc1ff;
+  }
+
+  /* ── REFINEMENT LAYER ─────────────────────────────────────
+     Color system extracted from Meetory workspace screenshot.
+     Deep cool-navy surfaces. Muted slate-indigo accent.
+     No glow, no neon. Integrated product palette.
+  ────────────────────────────────────────────────────────── */
+  :root {
+    /* Surfaces: layered cool navy, extracted from product UI
+       bg-0: page base  bg-1: sidebar/panel  bg-2: card  bg-3: active/hover */
+    --bg-0: #0e1118;
+    --bg-1: #12151f;
+    --bg-2: #171b28;
+    --bg-3: #1d2133;
+    --bg-4: #22273e;
+
+    /* Borders: very subtle cool lines, match product hairlines */
+    --border: #232840;
+    --border-soft: #1a1e30;
+    --border-strong: #2c3252;
+
+    /* Text: cool-tinted whites, exact product hierarchy */
+    --text-0: #e6e8f4;   /* primary — slightly cool white  */
+    --text-1: #b8bcd4;   /* secondary — muted slate        */
+    --text-2: #797e9c;   /* tertiary — readable mid-grey   */
+    --text-3: #525674;   /* placeholder / meta             */
+    --text-4: #363a58;   /* disabled / faintest            */
+
+    /* Accent: deep slate-indigo from product "New meeting" / "Mark done"
+       Muted, ~60% lightness, low chroma — sits IN the UI, not on it */
+    --indigo:   #4452cc;
+    --indigo-2: #4f5dd4;
+    --indigo-bg:     rgba(68, 82, 204, 0.10);
+    --indigo-border: rgba(68, 82, 204, 0.22);
+
+    /* Semantic chips — muted to match product screenshot tone */
+    --green:      #3dcc6e;
+    --green-bg:   rgba(61, 204, 110, 0.10);
+    --green-text: #6cd48e;
+
+    --orange:      #e8922e;
+    --orange-bg:   rgba(232, 146, 46, 0.10);
+    --orange-text: #e8a85e;
+
+    --yellow:      #e8b534;
+    --yellow-bg:   rgba(232, 181, 52, 0.10);
+    --yellow-text: #e8c860;
+
+    --blue:      #4898f0;
+    --blue-bg:   rgba(72, 152, 240, 0.10);
+    --blue-text: #7ab8f5;
+
+    --red:      #e05858;
+    --red-bg:   rgba(224, 88, 88, 0.10);
+    --red-text: #e07878;
+
+    /* Radius scale */
+    --r-xs:  4px;
+    --r-sm:  7px;
+    --r-md:  10px;
+    --r-lg:  14px;
+    --r-xl:  18px;
+    --r-pill: 100px;
+
+    /* Section spacing */
+    --section-y: 120px;
+  }
+
+  /* Apply radius scale globally */
+  .btn          { border-radius: var(--r-sm) !important; }
+  .btn-lg       { border-radius: var(--r-md) !important; }
+  .nav-link     { border-radius: var(--r-sm) !important; }
+
+  /* Cards & panels: more radius */
+  .prob-card, .pr-card, .uc-card, .step,
+  .feature, .hiw-card, .int-cat,
+  .feat-card-wrap, .dl-card,
+  .showcase-frame, .auth-card,
+  .trust, .cta-band, .final-cta,
+  .float, .frame { border-radius: var(--r-xl) !important; }
+
+  .feat-card, .hiw-mini, .task-col,
+  .panel, .sc-panel, .task-item,
+  .ba-card, .auth-preview,
+  .faq-item2, .an-stat { border-radius: var(--r-md) !important; }
+
+  .chip         { border-radius: var(--r-pill) !important; }
+  .av           { border-radius: 50% !important; }
+  .section-tag  { border-radius: var(--r-pill) !important; }
+  .auth-input   { border-radius: var(--r-sm) !important; }
+  .auth-google  { border-radius: var(--r-sm) !important; }
+
+  /* Nav: taller, more generous */
+  .nav-inner { height: 60px !important; }
+
+  /* Section vertical rhythm */
+  .mid-section  { padding: var(--section-y) 0 !important; }
+  .feat-section { padding: 88px 0 !important; }
+  .feat-section + .feat-section { padding-top: 44px !important; }
+
+  /* Hero: more top space */
+  .hero-wrap { padding: 96px 0 72px !important; }
+
+  /* Product frame: deeper shadow, softer border */
+  .product-frame {
+    border-radius: var(--r-xl) !important;
+    box-shadow:
+      0 48px 120px -40px rgba(0,0,0,0.72),
+      0 0 0 1px rgba(255,255,255,0.025),
+      0 1px 0 rgba(255,255,255,0.04) inset !important;
+  }
+  .product-frame-inner { border-radius: 12px !important; }
+
+  /* Showcase & feature frames */
+  .showcase-frame { border-radius: var(--r-xl) !important; }
+  .showcase-inner { border-radius: 12px !important; }
+  .frame          { border-radius: var(--r-xl) !important; }
+  .frame-inner    { border-radius: 12px !important; }
+
+  /* Buttons: slightly taller, more padding */
+  .btn { padding: 8px 15px !important; }
+  .btn-lg { padding: 11px 20px !important; }
+  .btn-primary {
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.09) inset,
+      0 2px 8px -2px rgba(68, 82, 204, 0.22) !important;
+  }
+
+  /* Typography: tighter body tracking, improved headings */
+  body { letter-spacing: -0.008em !important; }
+  h1   { letter-spacing: -0.032em !important; }
+  .mid-h2 { letter-spacing: -0.028em !important; }
+
+  /* Section tags: more padding */
+  .section-tag { padding: 5px 13px !important; font-size: 12px !important; }
+
+  /* Trust strip: rounder */
+  .trust { border-radius: var(--r-xl) !important; overflow: hidden !important; }
+  .trust-inner { border-radius: 0 !important; }
+
+  /* FAQ items: slightly taller question row */
+  .faq-q2 { padding: 17px 20px !important; }
+  .faq-a2-inner { padding: 0 20px 18px !important; padding-top: 13px !important; }
+
+  /* Pricing pop card: sharper accent glow */
+  .pr-card.pr-pop {
+    box-shadow: 0 0 0 1px var(--indigo-border) inset, 0 20px 48px -20px rgba(79,106,240,0.2) !important;
+  }
+
+  /* Auth card: deeper inset shadow */
+  .auth-card {
+    box-shadow: 0 32px 80px -24px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.025) !important;
+  }
+
+  /* Float cards: more radius */
+  .float-tasks, .float-decision, .float-cal { border-radius: var(--r-xl) !important; }
+
+  /* Input focus ring: softer */
+  .auth-input:focus {
+    border-color: var(--indigo) !important;
+    box-shadow: 0 0 0 3px rgba(79,106,240,0.13) !important;
+  }
+
+  /* Final CTA glow: product-matched, very subtle */
+  .final-cta-glow {
+    background: radial-gradient(ellipse 600px 200px at 50% 0%, rgba(74,86,226,0.10), transparent 70%) !important;
+  }
+
+  /* Hero BG: match new accent */
+  .hero-bg::before {
+    background:
+      radial-gradient(ellipse 1100px 520px at 50% 0%, rgba(68, 82, 204, 0.08), transparent 65%),
+      radial-gradient(ellipse 700px 360px at 12% 18%, rgba(72, 152, 240, 0.03), transparent 70%),
+      radial-gradient(ellipse 700px 360px at 88% 18%, rgba(61, 204, 110, 0.02), transparent 70%) !important;
+  }
+
+  /* Eyebrow pill: more radius */
+  .eyebrow { border-radius: var(--r-pill) !important; padding: 5px 14px 5px 7px !important; }
+
+  /* Section spacing sections */
+  section[style*="padding: 100px"] { padding: var(--section-y) 0 !important; }
+  section[style*="padding: 80px"]  { padding: 88px 0 !important; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    background: var(--bg-0);
+    color: var(--text-0);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.005em;
+    overflow-x: hidden;
+  }
+
+  /* Soft graphite vignette behind hero */
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .hero-bg::before {
+    content: "";
+    position: absolute;
+    inset: -200px 0 0;
+    background:
+      radial-gradient(ellipse 1100px 520px at 50% 0%, rgba(91, 108, 245, 0.16), transparent 65%),
+      radial-gradient(ellipse 700px 360px at 12% 18%, rgba(95, 168, 255, 0.06), transparent 70%),
+      radial-gradient(ellipse 700px 360px at 88% 18%, rgba(74, 222, 128, 0.04), transparent 70%);
+  }
+  /* faint grid */
+  .hero-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse 90% 60% at 50% 30%, black, transparent 80%);
+            mask-image: radial-gradient(ellipse 90% 60% at 50% 30%, black, transparent 80%);
+    opacity: 0.6;
+  }
+
+  .page { position: relative; z-index: 1; }
+
+  /* ============ NAV ============ */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    background: rgba(11, 14, 28, 0.6);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.25s, background 0.25s;
+  }
+  .nav.scrolled {
+    background: rgba(11, 14, 28, 0.85);
+    border-bottom-color: var(--border-soft);
+  }
+  .nav-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    height: 56px;
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-0);
+    letter-spacing: -0.01em;
+    text-decoration: none;
+  }
+  .logo-mark {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #6b7cff 0%, #4858d4 100%);
+    display: grid;
+    place-items: center;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.06) inset;
+    flex-shrink: 0;
+  }
+  .logo-mark::after {
+    content: "";
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    background: #fff;
+    opacity: 0.92;
+    transform: rotate(45deg);
+  }
+  .nav-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+  }
+  .nav-link {
+    color: var(--text-1);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 7px 12px;
+    border-radius: 7px;
+    transition: background 0.15s, color 0.15s;
+    font-weight: 450;
+  }
+  .nav-link:hover { background: var(--bg-2); color: var(--text-0); }
+  .nav-right { display: flex; align-items: center; gap: 8px; }
+
+  .menu-toggle {
+    display: none;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--text-1);
+    cursor: pointer;
+  }
+  .menu-toggle .bar {
+    display: block;
+    width: 14px; height: 1.5px;
+    background: currentColor;
+    margin: 3px 0;
+  }
+
+  /* ============ Buttons ============ */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 13px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    letter-spacing: -0.005em;
+  }
+  .btn-primary {
+    background: var(--indigo);
+    color: #fff;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.14) inset, 0 4px 14px -4px rgba(91, 108, 245, 0.5);
+  }
+  .btn-primary:hover { background: var(--indigo-2); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-1);
+  }
+  .btn-ghost:hover { background: var(--bg-2); color: var(--text-0); }
+  .btn-soft {
+    background: var(--bg-2);
+    color: var(--text-1);
+    border-color: var(--border);
+  }
+  .btn-soft:hover { background: var(--bg-3); color: var(--text-0); }
+  .btn-outline {
+    background: transparent;
+    color: var(--text-0);
+    border-color: var(--border-strong);
+  }
+  .btn-outline:hover { background: var(--bg-2); }
+  .btn-lg { padding: 10px 18px; font-size: 14px; border-radius: 8px; }
+
+  /* ============ Container ============ */
+  .container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 28px;
+    position: relative;
+  }
+
+  /* ============ HERO ============ */
+  .hero-wrap {
+    position: relative;
+    padding: 80px 0 60px;
+    overflow: hidden;
+  }
+
+  .hero {
+    text-align: center;
+    position: relative;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px 4px 6px;
+    background: rgba(22, 26, 51, 0.7);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 12px;
+    color: var(--text-1);
+    margin-bottom: 22px;
+    backdrop-filter: blur(8px);
+  }
+  .eyebrow .pip {
+    width: 18px; height: 18px;
+    border-radius: 5px;
+    background: var(--indigo-bg);
+    color: var(--indigo);
+    display: grid;
+    place-items: center;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .eyebrow .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.18);
+  }
+
+  h1 {
+    font-size: 60px;
+    line-height: 1.05;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    margin: 0 0 20px;
+    color: var(--text-0);
+    text-wrap: balance;
+    max-width: 920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  h1 .accent {
+    color: var(--text-3);
+    font-weight: 500;
+  }
+
+  .hero-sub {
+    max-width: 620px;
+    margin: 0 auto 28px;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--text-2);
+    text-wrap: pretty;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 14px;
+    align-items: center;
+  }
+  .hero-cta .btn-primary { padding: 11px 18px; font-size: 14px; }
+  .hero-cta .btn-ghost { padding: 11px 14px; font-size: 14px; color: var(--text-1); }
+
+  .hero-meta {
+    font-size: 12.5px;
+    color: var(--text-3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-meta .av-stack { display: flex; }
+  .hero-meta .av-stack .av { margin-right: -6px; border: 2px solid var(--bg-0); width: 20px; height: 20px; }
+
+  /* ============ MAIN PRODUCT MOCKUP (meeting detail) ============ */
+  .stage {
+    margin: 64px auto 0;
+    position: relative;
+    max-width: 1180px;
+    height: 700px;
+  }
+
+  .frame {
+    position: relative;
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 7px;
+    box-shadow:
+      0 40px 100px -30px rgba(0, 0, 0, 0.7),
+      0 0 0 1px rgba(255,255,255,0.02),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+    overflow: hidden;
+    z-index: 2;
+  }
+  .frame-inner {
+    background: var(--bg-0);
+    border-radius: 9px;
+    overflow: hidden;
+    border: 1px solid var(--border-soft);
+  }
+
+  /* mini app shell */
+  .app {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    min-height: 580px;
+    text-align: left;
+  }
+
+  /* shared chip + avatar */
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 1px 8px;
+    border-radius: 100px;
+    font-size: 10.5px;
+    font-weight: 500;
+    line-height: 1.7;
+    white-space: nowrap;
+  }
+  .chip .d { width: 5px; height: 5px; border-radius: 50%; }
+  .chip-orange { background: var(--orange-bg); color: var(--orange-text); }
+  .chip-orange .d { background: var(--orange); }
+  .chip-green { background: var(--green-bg); color: var(--green-text); }
+  .chip-green .d { background: var(--green); }
+  .chip-red { background: var(--red-bg); color: var(--red-text); }
+  .chip-red .d { background: var(--red); }
+  .chip-blue { background: var(--blue-bg); color: var(--blue-text); }
+  .chip-blue .d { background: var(--blue); }
+  .chip-yellow { background: var(--yellow-bg); color: var(--yellow-text); }
+  .chip-yellow .d { background: var(--yellow); }
+  .chip-indigo { background: var(--indigo-bg); color: #9ba8ff; }
+  .chip-indigo .d { background: var(--indigo); }
+  .chip-neutral { background: var(--bg-3); color: var(--text-1); border: 1px solid var(--border); padding: 0 7px; }
+
+  .av {
+    display: inline-grid; place-items: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    font-size: 9.5px; font-weight: 600;
+    flex-shrink: 0;
+    letter-spacing: 0.01em;
+  }
+  .av-zh { background: rgba(95, 168, 255, 0.2); color: #8fc1ff; }
+  .av-rc { background: rgba(244, 114, 114, 0.2); color: #f59595; }
+  .av-an { background: rgba(74, 222, 128, 0.2); color: #7ce5a3; }
+  .av-de { background: rgba(91, 108, 245, 0.22); color: #9ba8ff; }
+  .av-vi { background: rgba(245, 158, 60, 0.2); color: #f5b56b; }
+  .av-gu { background: rgba(247, 201, 72, 0.2); color: #f7d775; }
+  .av-sa { background: rgba(95, 168, 255, 0.2); color: #8fc1ff; }
+  .av-md { background: rgba(91, 108, 245, 0.2); color: #9ba8ff; }
+
+  /* sidebar */
+  .side {
+    background: var(--bg-1);
+    border-right: 1px solid var(--border-soft);
+    padding: 14px 10px;
+    font-size: 12px;
+  }
+  .side-logo { display: flex; align-items: center; gap: 8px; padding: 4px 8px 16px; }
+  .side-logo span { font-weight: 600; font-size: 13.5px; }
+
+  .side-search {
+    background: var(--bg-2);
+    border: 1px solid var(--border-soft);
+    border-radius: 7px;
+    padding: 6px 9px;
+    color: var(--text-3);
+    font-size: 11px;
+    display: flex; align-items: center; gap: 7px;
+    margin: 0 4px 12px;
+  }
+  .side-search .kbd {
+    margin-left: auto;
+    padding: 0 4px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 9.5px;
+    color: var(--text-3);
+  }
+
+  .side-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 6px 9px;
+    border-radius: 6px;
+    color: var(--text-1);
+    cursor: pointer;
+    font-size: 12.5px;
+  }
+  .side-item.active { background: var(--bg-3); color: var(--text-0); }
+  .side-item .ico {
+    width: 14px; height: 14px;
+    flex-shrink: 0;
+    color: var(--text-2);
+  }
+  .side-item.active .ico { color: var(--indigo); }
+  .side-item .count { margin-left: auto; color: var(--text-3); font-size: 11px; }
+
+  .side-section {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    padding: 16px 9px 6px;
+    font-weight: 500;
+  }
+
+  .side-meeting {
+    display: flex; align-items: center; gap: 9px;
+    padding: 5px 9px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--text-1);
+  }
+  .side-meeting.active { background: var(--bg-3); color: var(--text-0); }
+  .side-meeting .dot { width: 6px; height: 6px; border-radius: 2px; flex-shrink: 0; }
+  .side-meeting .when { margin-left: auto; color: var(--text-3); font-size: 10.5px; font-weight: 400; }
+
+  /* meeting detail screen */
+  .detail-top {
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border-soft);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .breadcrumb {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 11.5px;
+    color: var(--text-3);
+  }
+  .breadcrumb .sep { color: var(--text-4); }
+  .breadcrumb .here { color: var(--text-1); }
+  .top-spacer { flex: 1; }
+  .top-actions { display: flex; gap: 6px; align-items: center; }
+
+  .detail-header {
+    padding: 18px 22px 16px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .detail-title-row {
+    display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;
+  }
+  .detail-title {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.018em;
+    color: var(--text-0);
+    margin: 0;
+    flex: 1;
+    line-height: 1.2;
+  }
+  .detail-status-pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 4px 10px 4px 7px;
+    background: var(--green-bg);
+    color: var(--green-text);
+    border-radius: 100px;
+    font-size: 11.5px;
+    font-weight: 500;
+    border: 1px solid rgba(74, 222, 128, 0.2);
+  }
+  .detail-status-pill .check {
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--green);
+    display: grid; place-items: center;
+  }
+  .detail-status-pill .check::after {
+    content: ""; width: 6px; height: 3px;
+    border-left: 1.5px solid #0b0e1c;
+    border-bottom: 1.5px solid #0b0e1c;
+    transform: rotate(-45deg) translateY(-1px);
+  }
+  .detail-meta {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 12px;
+    color: var(--text-2);
+    flex-wrap: wrap;
+  }
+  .detail-meta .item { display: flex; align-items: center; gap: 5px; }
+  .detail-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-4); }
+  .av-stack { display: flex; align-items: center; }
+  .av-stack .av { margin-right: -6px; border: 2px solid var(--bg-0); }
+  .av-stack .more {
+    padding: 0 6px;
+    margin-left: 0px;
+    background: var(--bg-3);
+    border: 2px solid var(--bg-0);
+    border-radius: 100px;
+    font-size: 10px;
+    color: var(--text-2);
+    height: 22px;
+    display: inline-grid; place-items: center;
+    font-weight: 500;
+  }
+
+  /* tabs */
+  .detail-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 22px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .tab {
+    padding: 10px 14px;
+    font-size: 12.5px;
+    color: var(--text-2);
+    cursor: pointer;
+    border-bottom: 1.5px solid transparent;
+    margin-bottom: -1px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tab.active { color: var(--text-0); border-bottom-color: var(--indigo); }
+  .tab .badge {
+    background: var(--bg-3);
+    color: var(--text-2);
+    padding: 0 6px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 500;
+  }
+  .tab.active .badge { background: var(--indigo-bg); color: var(--indigo); }
+
+  /* detail body — 2 columns */
+  .detail-body {
+    padding: 18px 22px 22px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 18px;
+  }
+  .panel {
+    background: var(--bg-2);
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .panel-head {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .panel-head .ico {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    background: var(--indigo-bg);
+    color: var(--indigo);
+    display: grid; place-items: center;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .panel-head .ttl {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-0);
+    letter-spacing: -0.005em;
+  }
+  .panel-head .meta {
+    margin-left: auto;
+    font-size: 10.5px;
+    color: var(--text-3);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* summary content */
+  .summary-text {
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text-1);
+  }
+  .summary-text p { margin: 0 0 8px; }
+  .summary-text p:last-child { margin-bottom: 0; }
+  .summary-text .hl {
+    color: var(--text-0);
+    background: rgba(91, 108, 245, 0.08);
+    padding: 0 3px;
+    border-radius: 3px;
+    font-weight: 500;
+  }
+
+  /* decisions */
+  .decision {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 9px 0;
+    border-top: 1px solid var(--border-soft);
+    font-size: 12px;
+  }
+  .decision:first-of-type { border-top: 0; padding-top: 4px; }
+  .decision .num {
+    width: 18px; height: 18px;
+    border-radius: 5px;
+    background: var(--bg-3);
+    color: var(--text-2);
+    display: grid; place-items: center;
+    font-size: 10px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .decision .body { flex: 1; min-width: 0; }
+  .decision .body .ttl { color: var(--text-0); font-size: 12.5px; line-height: 1.45; margin-bottom: 4px; }
+  .decision .body .meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 10.5px; color: var(--text-3); }
+
+  /* action items */
+  .action {
+    display: grid;
+    grid-template-columns: 14px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 9px 0;
+    border-top: 1px solid var(--border-soft);
+    font-size: 12px;
+  }
+  .action:first-of-type { border-top: 0; }
+  .action .check {
+    width: 14px; height: 14px;
+    border-radius: 4px;
+    border: 1.2px solid var(--border-strong);
+    background: var(--bg-3);
+  }
+  .action .body .ttl { color: var(--text-0); font-size: 12.5px; line-height: 1.4; margin-bottom: 4px; }
+  .action .body .meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 10.5px; color: var(--text-3); }
+
+  /* transcript snippets */
+  .ts-snip {
+    padding: 8px 0;
+    border-top: 1px solid var(--border-soft);
+    font-size: 12px;
+  }
+  .ts-snip:first-of-type { border-top: 0; padding-top: 0; }
+  .ts-snip .who-row {
+    display: flex; align-items: center; gap: 7px;
+    margin-bottom: 4px;
+  }
+  .ts-snip .who { font-size: 11px; color: var(--text-1); font-weight: 500; }
+  .ts-snip .when { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); }
+  .ts-snip .play { margin-left: auto; color: var(--indigo); font-size: 10px; cursor: pointer; }
+  .ts-snip .text {
+    color: var(--text-1);
+    font-size: 12px;
+    line-height: 1.55;
+    padding-left: 0;
+  }
+  .ts-snip .text .hl {
+    color: var(--text-0);
+    border-bottom: 1px dashed rgba(91, 108, 245, 0.6);
+  }
+
+  /* ============ Floating cards (absolute) ============ */
+  .float {
+    position: absolute;
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    z-index: 5;
+    box-shadow:
+      0 24px 60px -20px rgba(0, 0, 0, 0.65),
+      0 0 0 1px rgba(255,255,255,0.025),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+    backdrop-filter: blur(12px);
+    width: 280px;
+  }
+  .float-head {
+    display: flex; align-items: center; gap: 9px;
+    margin-bottom: 11px;
+  }
+  .float-head .ic {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    display: grid; place-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .float-head .body { flex: 1; min-width: 0; }
+  .float-head .ttl { font-size: 13px; font-weight: 600; color: var(--text-0); line-height: 1.3; }
+  .float-head .sub { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+
+  /* float 1: tasks */
+  .float-tasks { top: 110px; left: -32px; transform: rotate(-3deg); }
+  .float-tasks .ic { background: var(--indigo-bg); color: var(--indigo); }
+  .float-task-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0;
+    border-top: 1px solid var(--border-soft);
+    font-size: 11.5px;
+  }
+  .float-task-row:first-of-type { border-top: 0; padding-top: 2px; }
+  .float-task-row .check {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    border: 1px solid var(--border-strong);
+    flex-shrink: 0;
+  }
+  .float-task-row .name { flex: 1; color: var(--text-0); font-size: 11.5px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .float-task-row .av { width: 18px; height: 18px; font-size: 8.5px; }
+
+  /* float 2: decision */
+  .float-decision { top: 290px; right: -32px; transform: rotate(3deg); }
+  .float-decision .ic { background: var(--orange-bg); color: var(--orange-text); }
+  .float-decision .quote {
+    font-size: 12px;
+    color: var(--text-1);
+    line-height: 1.5;
+    padding: 9px 11px;
+    background: var(--bg-2);
+    border: 1px solid var(--border-soft);
+    border-left: 2px solid var(--orange);
+    border-radius: 6px;
+    margin-bottom: 9px;
+  }
+  .float-decision .meta {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 10.5px; color: var(--text-3);
+  }
+
+  /* float 3: calendar */
+  .float-cal { bottom: 80px; left: 30px; transform: rotate(-2deg); }
+  .float-cal .ic { background: var(--blue-bg); color: var(--blue-text); }
+  .float-cal-event {
+    background: var(--bg-2);
+    border: 1px solid var(--border-soft);
+    border-left: 2px solid var(--blue);
+    border-radius: 6px;
+    padding: 9px 11px;
+    font-size: 11.5px;
+  }
+  .float-cal-event .ev-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-2);
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .float-cal-event .ev-time .live-d {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.18);
+  }
+  .float-cal-event .ev-name { color: var(--text-0); font-weight: 500; font-size: 12px; margin-bottom: 5px; }
+  .float-cal-event .ev-meta { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-3); }
+
+  /* ============ Trust strip ============ */
+  .trust {
+    margin: 80px auto 0;
+    max-width: 1100px;
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+    background: var(--bg-1);
+    overflow: hidden;
+  }
+  .trust-inner {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .trust-cell {
+    padding: 22px 24px;
+    border-right: 1px solid var(--border-soft);
+  }
+  .trust-cell:last-child { border-right: 0; }
+  .trust-cell .lbl {
+    font-size: 11px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .trust-cell .lbl .d {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--text-3);
+  }
+  .trust-cell .num {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text-0);
+    margin-bottom: 4px;
+    line-height: 1;
+  }
+  .trust-cell .num .ph {
+    color: var(--text-3);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0;
+    margin-left: 4px;
+  }
+  .trust-cell .desc {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.45;
+  }
+  .trust-foot {
+    border-top: 1px solid var(--border-soft);
+    padding: 11px 24px;
+    font-size: 11.5px;
+    color: var(--text-3);
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(0,0,0,0.15);
+  }
+  .trust-foot .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.18);
+  }
+
+  /* ============ Mobile menu ============ */
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    inset: 56px 0 auto 0;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    z-index: 49;
+    padding: 12px 20px 20px;
+  }
+  .mobile-menu.open { display: block; }
+  .mobile-menu a {
+    display: block;
+    padding: 10px 12px;
+    color: var(--text-1);
+    text-decoration: none;
+    font-size: 14px;
+    border-radius: 7px;
+  }
+  .mobile-menu a:hover { background: var(--bg-2); color: var(--text-0); }
+  .mobile-menu .mob-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-soft);
+  }
+  .mobile-menu .mob-actions .btn { flex: 1; justify-content: center; }
+
+  /* ============ Responsive ============ */
+  @media (max-width: 1080px) {
+    .float { display: none; }
+    h1 { font-size: 48px; }
+  }
+  @media (max-width: 900px) {
+    .nav-center { display: none; }
+    .menu-toggle { display: block; }
+    .nav-right .btn:not(.btn-primary) { display: none; }
+    h1 { font-size: 40px; }
+    .hero-sub { font-size: 15px; }
+    .stage { height: auto; }
+    .app { grid-template-columns: 1fr; }
+    .side { display: none; }
+    .detail-body { grid-template-columns: 1fr; }
+    .trust-inner { grid-template-columns: 1fr 1fr; }
+    .trust-cell:nth-child(2) { border-right: 0; }
+    .trust-cell:nth-child(1), .trust-cell:nth-child(2) { border-bottom: 1px solid var(--border-soft); }
+    .detail-tabs { overflow-x: auto; padding-bottom: 0; }
+  }
+  @media (max-width: 540px) {
+    .hero-cta { flex-direction: column; align-items: stretch; }
+    .hero-cta .btn { justify-content: center; }
+    h1 { font-size: 34px; }
+    .container { padding: 0 18px; }
+    .trust-inner { grid-template-columns: 1fr; }
+    .trust-cell { border-right: 0; border-bottom: 1px solid var(--border-soft); }
+    .trust-cell:last-child { border-bottom: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ========== NAV ========== -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="logo" href="#"><span class="logo-mark"></span>Meetory</a>
+      <div class="nav-center">
+        <a class="nav-link" href="#">Product</a>
+        <a class="nav-link" href="#">Features</a>
+        <a class="nav-link" href="#">How it works</a>
+        <a class="nav-link" href="#">Integrations</a>
+        <a class="nav-link" href="#">FAQ</a>
+      </div>
+      <div class="nav-right">
+        <a class="btn btn-ghost" href="#">Sign in</a>
+        <a class="btn btn-primary" href="#">
+          <span>Open app</span>
+          <span style="opacity:.75; margin-left:1px;">→</span>
+        </a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#">Product</a>
+      <a href="#">Features</a>
+      <a href="#">How it works</a>
+      <a href="#">Integrations</a>
+      <a href="#">FAQ</a>
+      <div class="mob-actions">
+        <a class="btn btn-soft" href="#">Sign in</a>
+        <a class="btn btn-primary" href="#">Open app</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== HERO ========== -->
+  <section class="hero-wrap">
+    <div class="hero-bg"></div>
+    <div class="container">
+      <div class="hero">
+        <div class="eyebrow">
+          <span class="pip">AI</span>
+          <span>AI meeting workspace</span>
+          <span class="live-dot" style="margin-left:2px;"></span>
+        </div>
+        <h1>Turn every meeting into summaries, tasks, <span class="accent">and next steps.</span></h1>
+        <p class="hero-sub">
+          Meetory captures conversations, structures decisions, creates action items, and keeps every follow-up in one shared workspace.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#">
+            <span>Open app</span>
+            <span style="opacity:.8;">→</span>
+          </a>
+          <a class="btn btn-ghost" href="#">See how it works</a>
+        </div>
+        <div class="hero-meta">
+          <span>Built for teams that live in meetings.</span>
+        </div>
+      </div>
+
+      <!-- ========== STAGE: meeting detail mockup + floating cards ========== -->
+      <div class="stage">
+
+        <!-- ===== Floating card 1: Tasks ===== -->
+        <div class="float float-tasks">
+          <div class="float-head">
+            <div class="ic">＋</div>
+            <div class="body">
+              <div class="ttl">3 action items created</div>
+              <div class="sub">From Product Sync · just now</div>
+            </div>
+          </div>
+          <div class="float-task-row">
+            <div class="check"></div>
+            <div class="name">Confirm Stripe SLA before Billing v2</div>
+            <span class="chip chip-orange"><span class="d"></span>High</span>
+            <span class="av av-an">AN</span>
+          </div>
+          <div class="float-task-row">
+            <div class="check"></div>
+            <div class="name">Draft pricing FAQ for sales team</div>
+            <span class="chip chip-yellow"><span class="d"></span>Apr 28</span>
+            <span class="av av-sa">SA</span>
+          </div>
+          <div class="float-task-row">
+            <div class="check"></div>
+            <div class="name">Audit billing webhook reliability</div>
+            <span class="chip chip-blue"><span class="d"></span>May 02</span>
+            <span class="av av-de">DE</span>
+          </div>
+        </div>
+
+        <!-- ===== Floating card 2: Decision ===== -->
+        <div class="float float-decision">
+          <div class="float-head">
+            <div class="ic">D</div>
+            <div class="body">
+              <div class="ttl">Pricing decision captured</div>
+              <div class="sub">Confidence 92% · 1 min ago</div>
+            </div>
+          </div>
+          <div class="quote">
+            "We'll keep the $14/seat tier and add a free plan up to 10 users — Anna to draft comms by Friday."
+          </div>
+          <div class="meta">
+            <span class="av av-zh">ZH</span>
+            <span style="color:var(--text-2)">Zheka</span>
+            <span style="color:var(--text-4)">·</span>
+            <span style="font-family:'JetBrains Mono',monospace;">00:18:42</span>
+            <span style="margin-left:auto; color:var(--indigo);">▶ Play</span>
+          </div>
+        </div>
+
+        <!-- ===== Floating card 3: Calendar / sync ===== -->
+        <div class="float float-cal">
+          <div class="float-head">
+            <div class="ic">📅</div>
+            <div class="body">
+              <div class="ttl">Next meeting synced</div>
+              <div class="sub">Calendar · agenda prepared</div>
+            </div>
+          </div>
+          <div class="float-cal-event">
+            <div class="ev-time">
+              <span class="live-d"></span>
+              <span>Tomorrow · 10:00 – 10:45</span>
+            </div>
+            <div class="ev-name">Q2 Planning — Engineering</div>
+            <div class="ev-meta">
+              <div class="av-stack">
+                <span class="av av-zh">ZH</span>
+                <span class="av av-an">AN</span>
+                <span class="av av-de">DE</span>
+              </div>
+              <span style="color:var(--text-2)">+5</span>
+              <span style="margin-left:auto;" class="chip chip-indigo"><span class="d"></span>Agenda ready</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Frame (meeting detail) ===== -->
+        <div class="frame">
+          <div class="frame-inner">
+            <div class="app">
+              <!-- sidebar -->
+              <aside class="side">
+                <div class="side-logo"><span class="logo-mark"></span><span>Meetory</span></div>
+                <div class="side-search">
+                  <span style="opacity:.6">⌕</span>
+                  <span>Search…</span>
+                  <span class="kbd">⌘K</span>
+                </div>
+                <div class="side-item">
+                  <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+                  Workspace
+                </div>
+                <div class="side-item active">
+                  <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6h12"/><path d="M5 2v3M11 2v3"/></svg>
+                  Meetings <span class="count">12</span>
+                </div>
+                <div class="side-item">
+                  <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4l2 2 4-5"/><path d="M3 8l2 2 4-5"/><path d="M3 12l2 2 4-5"/><path d="M11 4h4M11 8h4M11 12h4"/></svg>
+                  Tasks <span class="count">28</span>
+                </div>
+                <div class="side-item">
+                  <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7" cy="7" r="4.5"/><path d="M14 14l-3-3"/></svg>
+                  Search
+                </div>
+
+                <div class="side-section">Recent</div>
+                <div class="side-meeting active"><span class="dot" style="background:var(--orange)"></span>Product Sync<span class="when">today</span></div>
+                <div class="side-meeting"><span class="dot" style="background:var(--yellow)"></span>Q2 Planning<span class="when">tmrw</span></div>
+                <div class="side-meeting"><span class="dot" style="background:var(--green)"></span>Marketing Sync<span class="when">fri</span></div>
+                <div class="side-meeting"><span class="dot" style="background:var(--blue)"></span>Design Review<span class="when">mon</span></div>
+
+                <div class="side-section">Pinned</div>
+                <div class="side-meeting"><span class="av av-zh" style="width:18px; height:18px; font-size:8.5px;">ZH</span>Zheka<span class="when">4·2</span></div>
+                <div class="side-meeting"><span class="av av-an" style="width:18px; height:18px; font-size:8.5px;">AN</span>Anna K.<span class="when">7·1</span></div>
+                <div class="side-meeting"><span class="av av-de" style="width:18px; height:18px; font-size:8.5px;">DE</span>Designer<span class="when">3</span></div>
+              </aside>
+
+              <!-- meeting detail -->
+              <main>
+                <div class="detail-top">
+                  <div class="breadcrumb">
+                    <span>Meetings</span>
+                    <span class="sep">/</span>
+                    <span class="here">Product Sync</span>
+                    <span class="sep">/</span>
+                    <span style="font-family:'JetBrains Mono',monospace; color:var(--text-3);">MTG-204 · Apr 24</span>
+                  </div>
+                  <div class="top-spacer"></div>
+                  <div class="top-actions">
+                    <button class="btn btn-soft" style="padding:5px 10px; font-size:11.5px;">Share</button>
+                    <button class="btn btn-soft" style="padding:5px 10px; font-size:11.5px;">⋯</button>
+                  </div>
+                </div>
+
+                <div class="detail-header">
+                  <div class="detail-title-row">
+                    <div style="width:8px; height:8px; border-radius:3px; background:var(--orange); margin-top:11px;"></div>
+                    <h2 class="detail-title">Product Sync</h2>
+                    <span class="detail-status-pill">
+                      <span class="check"></span>
+                      Summary ready
+                    </span>
+                  </div>
+                  <div class="detail-meta">
+                    <div class="item"><span style="color:var(--text-3)">Thu, Apr 24</span> · <span>10:00 – 10:48</span></div>
+                    <span class="dot"></span>
+                    <div class="item">
+                      <div class="av-stack">
+                        <span class="av av-zh">ZH</span>
+                        <span class="av av-an">AN</span>
+                        <span class="av av-rc">RC</span>
+                        <span class="av av-de">DE</span>
+                        <span class="av av-vi">VI</span>
+                        <span class="more">+3</span>
+                      </div>
+                      <span style="margin-left:6px; color:var(--text-2)">8 participants</span>
+                    </div>
+                    <span class="dot"></span>
+                    <div class="item"><span style="color:var(--text-3)">Captured by Meetory AI</span></div>
+                  </div>
+                </div>
+
+                <div class="detail-tabs">
+                  <div class="tab active">Summary</div>
+                  <div class="tab">Decisions <span class="badge">4</span></div>
+                  <div class="tab">Action items <span class="badge">7</span></div>
+                  <div class="tab">Transcript</div>
+                  <div class="tab">Recording</div>
+                </div>
+
+                <div class="detail-body">
+                  <!-- left column -->
+                  <div style="display:flex; flex-direction:column; gap:14px;">
+                    <!-- summary panel -->
+                    <div class="panel">
+                      <div class="panel-head">
+                        <div class="ico">S</div>
+                        <div class="ttl">Summary</div>
+                        <div class="meta">48 min · 8 speakers</div>
+                      </div>
+                      <div class="summary-text">
+                        <p>The team aligned on <span class="hl">Billing v2 timing</span> and confirmed the rollout window for early May. Engineering raised concerns about the rate-limit middleware being duplicated across three services.</p>
+                        <p>Pricing direction was settled: keep the $14 tier, introduce a free plan up to 10 seats. Anna will draft comms; Zheka owns the engineering blockers.</p>
+                      </div>
+                    </div>
+
+                    <!-- decisions -->
+                    <div class="panel">
+                      <div class="panel-head">
+                        <div class="ico" style="background:var(--orange-bg); color:var(--orange-text)">D</div>
+                        <div class="ttl">Key decisions</div>
+                        <div class="meta">4 captured</div>
+                      </div>
+                      <div class="decision">
+                        <div class="num">01</div>
+                        <div class="body">
+                          <div class="ttl">Keep $14/seat tier and ship a free plan capped at 10 users.</div>
+                          <div class="meta"><span class="chip chip-green"><span class="d"></span>Approved</span><span>Confidence 92%</span><span style="font-family:'JetBrains Mono',monospace;">00:18:42</span></div>
+                        </div>
+                      </div>
+                      <div class="decision">
+                        <div class="num">02</div>
+                        <div class="body">
+                          <div class="ttl">Postpone vendor migration to Q3 — SLA not firm.</div>
+                          <div class="meta"><span class="chip chip-green"><span class="d"></span>Approved</span><span>Confidence 88%</span><span style="font-family:'JetBrains Mono',monospace;">00:31:09</span></div>
+                        </div>
+                      </div>
+                      <div class="decision">
+                        <div class="num">03</div>
+                        <div class="body">
+                          <div class="ttl">Extract rate-limit middleware into shared package.</div>
+                          <div class="meta"><span class="chip chip-yellow"><span class="d"></span>Needs review</span><span>Confidence 81%</span><span style="font-family:'JetBrains Mono',monospace;">00:34:12</span></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- action items -->
+                    <div class="panel">
+                      <div class="panel-head">
+                        <div class="ico" style="background:var(--blue-bg); color:var(--blue-text)">✓</div>
+                        <div class="ttl">Action items</div>
+                        <div class="meta">7 created · 3 routed</div>
+                      </div>
+                      <div class="action">
+                        <div class="check"></div>
+                        <div class="body">
+                          <div class="ttl">Draft pricing FAQ for sales team</div>
+                          <div class="meta"><span class="chip chip-yellow"><span class="d"></span>Apr 28</span><span class="chip chip-blue"><span class="d"></span>In progress</span><span>Linear · ENG-1842</span></div>
+                        </div>
+                        <span class="av av-an">AN</span>
+                      </div>
+                      <div class="action">
+                        <div class="check"></div>
+                        <div class="body">
+                          <div class="ttl">Confirm Stripe SLA before Billing v2 launch</div>
+                          <div class="meta"><span class="chip chip-orange"><span class="d"></span>High</span><span class="chip chip-red"><span class="d"></span>Blocked</span><span>Linear · BIL-321</span></div>
+                        </div>
+                        <span class="av av-sa">SA</span>
+                      </div>
+                      <div class="action">
+                        <div class="check"></div>
+                        <div class="body">
+                          <div class="ttl">Audit billing webhook reliability</div>
+                          <div class="meta"><span class="chip chip-blue"><span class="d"></span>May 02</span><span class="chip chip-yellow"><span class="d"></span>To do</span></div>
+                        </div>
+                        <span class="av av-de">DE</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- right column: transcript snippets + properties -->
+                  <div style="display:flex; flex-direction:column; gap:14px;">
+                    <!-- properties / metadata -->
+                    <div class="panel">
+                      <div class="panel-head">
+                        <div class="ico">i</div>
+                        <div class="ttl">Properties</div>
+                      </div>
+                      <div style="display:grid; grid-template-columns: 80px 1fr; row-gap:7px; font-size:11.5px;">
+                        <div style="color:var(--text-3)">Owner</div>
+                        <div style="display:flex; align-items:center; gap:6px;"><span class="av av-zh" style="width:18px; height:18px; font-size:8.5px;">ZH</span><span style="color:var(--text-1)">Zheka P.</span></div>
+                        <div style="color:var(--text-3)">Series</div>
+                        <div><span class="chip chip-orange"><span class="d"></span>Product Sync</span></div>
+                        <div style="color:var(--text-3)">Tags</div>
+                        <div style="display:flex; gap:4px; flex-wrap:wrap;"><span class="chip chip-blue">billing</span><span class="chip chip-indigo">pricing</span><span class="chip chip-neutral">engineering</span></div>
+                        <div style="color:var(--text-3)">Recording</div>
+                        <div style="color:var(--text-1); display:flex; align-items:center; gap:6px;"><span style="color:var(--indigo)">▶</span> 48:12 · transcript ready</div>
+                        <div style="color:var(--text-3)">Synced to</div>
+                        <div style="color:var(--text-1); display:flex; align-items:center; gap:6px;"><span style="width:10px; height:10px; border-radius:2px; background:#5e6ad2; display:inline-block;"></span>Linear · 3 issues</div>
+                      </div>
+                    </div>
+
+                    <!-- transcript snippets -->
+                    <div class="panel">
+                      <div class="panel-head">
+                        <div class="ico" style="background:var(--green-bg); color:var(--green-text)">T</div>
+                        <div class="ttl">Transcript highlights</div>
+                        <div class="meta">5 clipped</div>
+                      </div>
+                      <div class="ts-snip">
+                        <div class="who-row">
+                          <span class="av av-zh" style="width:18px; height:18px; font-size:8.5px;">ZH</span>
+                          <span class="who">Zheka</span>
+                          <span class="when">00:18:42</span>
+                          <span class="play">▶ 0:08</span>
+                        </div>
+                        <div class="text">"Let's <span class="hl">keep the $14 tier and add a free plan up to 10 users</span> — Anna, can you draft comms by Friday?"</div>
+                      </div>
+                      <div class="ts-snip">
+                        <div class="who-row">
+                          <span class="av av-an" style="width:18px; height:18px; font-size:8.5px;">AN</span>
+                          <span class="who">Anna K.</span>
+                          <span class="when">00:34:08</span>
+                          <span class="play">▶ 0:11</span>
+                        </div>
+                        <div class="text">"The rate-limit middleware is already used in three places — <span class="hl">I can take ownership before Billing v2 lands</span>."</div>
+                      </div>
+                      <div class="ts-snip">
+                        <div class="who-row">
+                          <span class="av av-rc" style="width:18px; height:18px; font-size:8.5px;">RC</span>
+                          <span class="who">Roma C.</span>
+                          <span class="when">00:31:09</span>
+                          <span class="play">▶ 0:06</span>
+                        </div>
+                        <div class="text">"<span class="hl">We're postponing the migration</span> to Q3 — vendor SLA still isn't firm."</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </main>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== TRUST STRIP ========== -->
+      <div class="trust">
+        <div class="trust-inner">
+          <div class="trust-cell">
+            <div class="lbl"><span class="d"></span>Meetings organized</div>
+            <div class="num">12,840<span class="ph">demo</span></div>
+            <div class="desc">Across recurring syncs, planning, reviews, and 1:1s.</div>
+          </div>
+          <div class="trust-cell">
+            <div class="lbl"><span class="d" style="background:var(--indigo)"></span>Action items created</div>
+            <div class="num">38,205<span class="ph">demo</span></div>
+            <div class="desc">Auto-routed to Linear, Jira, Notion with owners and due dates.</div>
+          </div>
+          <div class="trust-cell">
+            <div class="lbl"><span class="d" style="background:var(--orange)"></span>Decisions captured</div>
+            <div class="num">6,712<span class="ph">demo</span></div>
+            <div class="desc">Tagged, searchable, with the exact clip behind every call.</div>
+          </div>
+          <div class="trust-cell">
+            <div class="lbl"><span class="d" style="background:var(--blue)"></span>Searchable context</div>
+            <div class="num">2.1M<span class="ph">words</span></div>
+            <div class="desc">Full-text across every transcript, summary, and decision.</div>
+          </div>
+        </div>
+        <div class="trust-foot">
+          <span class="live-dot"></span>
+          <span>Numbers update live across your workspace — placeholders shown until you connect your calendar.</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       MIDDLE SECTIONS
+  ============================================================ -->
+
+  <!-- ========== 1. PROBLEM ========== -->
+  <section class="mid-section" style="padding: 120px 0 100px;">
+    <div class="container">
+
+      <div class="mid-head" style="max-width:680px; margin:0 auto 56px; text-align:center;">
+        <div class="section-tag" style="justify-content:center; margin-bottom:16px;">
+          <span class="tag-dot"></span>The problem
+        </div>
+        <h2 class="mid-h2">Most meetings end.<br/>The work gets lost.</h2>
+        <p class="mid-sub">Meetings create decisions, tasks, risks, and follow-ups. But those outcomes usually end up scattered across docs, chats, recordings, and people's memory.</p>
+      </div>
+
+      <!-- Problem cards -->
+      <div class="prob-grid">
+        <div class="prob-card">
+          <div class="prob-icon" style="background:var(--orange-bg); color:var(--orange-text);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M5 7h6M5 10h4"/></svg>
+          </div>
+          <div class="prob-title">Notes everywhere</div>
+          <div class="prob-desc">Meeting notes live in docs, chats, recordings, and personal notebooks. Nothing connects.</div>
+          <div class="prob-art">
+            <div class="prob-scatter">
+              <span class="scatter-tag" style="background:rgba(245,158,60,.12); color:var(--orange-text); top:4px; left:12px;">Notion doc</span>
+              <span class="scatter-tag" style="background:rgba(95,168,255,.1); color:var(--blue-text); top:20px; right:8px;">Slack thread</span>
+              <span class="scatter-tag" style="background:rgba(74,222,128,.1); color:var(--green-text); bottom:8px; left:24px;">Recording</span>
+              <span class="scatter-tag" style="background:var(--bg-3); color:var(--text-2); bottom:16px; right:16px;">Personal notes</span>
+              <span class="scatter-tag" style="background:var(--indigo-bg); color:#9ba8ff; top:44px; left:70px;">Google Doc</span>
+            </div>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-icon" style="background:var(--red-bg); color:var(--red-text);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3v5l3 2"/><circle cx="8" cy="8" r="5.5"/></svg>
+          </div>
+          <div class="prob-title">Follow-ups get missed</div>
+          <div class="prob-desc">Action items are discussed but not clearly assigned, tracked, or completed by anyone.</div>
+          <div class="prob-art">
+            <div class="prob-scatter" style="display:flex; flex-direction:column; gap:6px;">
+              <div class="missed-row"><span class="miss-check"></span><span class="miss-text" style="text-decoration:line-through; opacity:.4;">Confirm vendor SLA</span><span class="miss-who" style="opacity:.3;">?</span></div>
+              <div class="missed-row"><span class="miss-check"></span><span class="miss-text" style="text-decoration:line-through; opacity:.4;">Draft pricing page</span><span class="miss-who" style="opacity:.3;">?</span></div>
+              <div class="missed-row"><span class="miss-check"></span><span class="miss-text" style="text-decoration:line-through; opacity:.4;">Schedule follow-up</span><span class="miss-who" style="opacity:.3;">?</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-icon" style="background:var(--blue-bg); color:var(--blue-text);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 14l3-3m0 0a5 5 0 117.07-7.07A5 5 0 015 11zm6-6l2-2"/></svg>
+          </div>
+          <div class="prob-title">Decisions disappear</div>
+          <div class="prob-desc">Teams forget what was agreed, who said it, and where the context lives. Conversations repeat.</div>
+          <div class="prob-art">
+            <div class="prob-scatter" style="display:flex; flex-direction:column; gap:5px;">
+              <div class="ghost-line" style="width:90%; opacity:.18; height:8px; border-radius:4px; background:var(--text-0);"></div>
+              <div class="ghost-line" style="width:65%; opacity:.10; height:8px; border-radius:4px; background:var(--text-0);"></div>
+              <div class="ghost-line" style="width:80%; opacity:.07; height:8px; border-radius:4px; background:var(--text-0);"></div>
+              <div style="margin-top:6px; font-size:11px; color:var(--text-3); font-style:italic;">"Wait, did we decide this already?"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Before / After -->
+      <div class="ba-wrap">
+        <div class="ba-col before">
+          <div class="ba-label"><span class="ba-dot" style="background:var(--red);"></span>Before</div>
+          <div class="ba-card">
+            <div class="ba-row"><span class="ba-icon" style="background:rgba(245,158,60,.15); color:var(--orange-text);">N</span><span class="ba-name">sprint-retro-notes.docx</span><span class="ba-meta">Google Drive</span></div>
+            <div class="ba-row"><span class="ba-icon" style="background:rgba(95,168,255,.12); color:var(--blue-text);">S</span><span class="ba-name">#product-sync thread</span><span class="ba-meta">Slack</span></div>
+            <div class="ba-row"><span class="ba-icon" style="background:rgba(244,114,114,.12); color:var(--red-text);">Z</span><span class="ba-name">Weekly Sync — Apr 24.mp4</span><span class="ba-meta">Zoom cloud</span></div>
+            <div class="ba-row"><span class="ba-icon" style="background:var(--bg-3); color:var(--text-2);">📝</span><span class="ba-name">Anna's personal notes</span><span class="ba-meta">Notion</span></div>
+            <div class="ba-row" style="opacity:.5;"><span class="ba-icon" style="background:var(--bg-3); color:var(--text-3);">?</span><span class="ba-name" style="color:var(--text-3);">…and 6 more places</span><span class="ba-meta"></span></div>
+          </div>
+        </div>
+        <div class="ba-arrow">→</div>
+        <div class="ba-col after">
+          <div class="ba-label"><span class="ba-dot" style="background:var(--green);"></span>After Meetory</div>
+          <div class="ba-card" style="border-color: rgba(74,222,128,0.2);">
+            <div class="ba-panel-head"><span class="ba-panel-ico" style="background:var(--indigo-bg); color:var(--indigo);">S</span><span style="font-weight:600; color:var(--text-0); font-size:12px;">Weekly Product Sync</span><span class="chip chip-green" style="margin-left:auto;"><span class="d"></span>Summary ready</span></div>
+            <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
+              <div class="ba-stat"><span class="ba-stat-num">3</span>Decisions</div>
+              <div class="ba-stat"><span class="ba-stat-num">7</span>Action items</div>
+              <div class="ba-stat"><span class="ba-stat-num">8</span>Participants</div>
+              <div class="ba-stat"><span class="ba-stat-num">48m</span>Transcript</div>
+            </div>
+            <div style="display:flex; gap:5px; margin-top:8px; flex-wrap:wrap;">
+              <span class="chip chip-green"><span class="d"></span>Routed to Linear</span>
+              <span class="chip chip-blue"><span class="d"></span>Owners assigned</span>
+              <span class="chip chip-indigo"><span class="d"></span>Searchable</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== 2. PRODUCT SHOWCASE ========== -->
+  <section class="mid-section" style="padding: 60px 0 100px;">
+    <div class="container">
+      <div class="mid-head" style="max-width:680px; margin:0 auto 48px; text-align:center;">
+        <div class="section-tag" style="justify-content:center; margin-bottom:16px;">
+          <span class="tag-dot" style="background:var(--indigo);"></span>Product
+        </div>
+        <h2 class="mid-h2">One place for every meeting</h2>
+        <p class="mid-sub">Meetory organizes meeting summaries, transcripts, decisions, and action items into one shared workspace your team can actually use.</p>
+      </div>
+
+      <!-- Full-width product mockup -->
+      <div class="showcase-frame">
+        <div class="showcase-inner">
+          <div class="showcase-app">
+            <!-- Sidebar -->
+            <aside class="sc-side">
+              <div class="sc-logo"><span class="logo-mark"></span><span>Meetory</span></div>
+              <div class="sc-nav-item"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Home</div>
+              <div class="sc-nav-item active"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6h12"/><path d="M5 2v3M11 2v3"/></svg>Meetings<span class="sc-badge">12</span></div>
+              <div class="sc-nav-item"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 4l2 2 4-4M3 8l2 2 4-4M3 12l2 2 4-4"/></svg>Tasks<span class="sc-badge">28</span></div>
+              <div class="sc-nav-item"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M13 13l-3-3"/></svg>Search</div>
+              <div class="sc-nav-item"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="5" r="2.5"/><path d="M2 14c0-3 2.5-5 6-5s6 2 6 5"/></svg>Team</div>
+              <div style="flex:1;"></div>
+              <div class="sc-nav-item" style="margin-bottom:0;"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="2"/><path d="M8 2v1M8 13v1M2 8h1M13 8h1M3.5 3.5l.7.7M11.8 11.8l.7.7M3.5 12.5l.7-.7M11.8 4.2l.7-.7"/></svg>Settings</div>
+            </aside>
+            <!-- Main -->
+            <div class="sc-main">
+              <!-- Topbar -->
+              <div class="sc-topbar">
+                <div class="sc-search"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M13 13l-3-3"/></svg><span>Search meetings, decisions, people…</span><span class="kbd-tag">⌘K</span></div>
+                <div style="flex:1;"></div>
+                <button class="btn btn-primary" style="padding:5px 11px; font-size:12px; gap:5px;">+ New meeting</button>
+                <span class="av av-zh" style="width:26px; height:26px; font-size:10px;">ZH</span>
+              </div>
+
+              <div class="sc-body">
+                <!-- Meeting list col -->
+                <div class="sc-list">
+                  <div class="sc-list-head">
+                    <span style="font-weight:600; font-size:13px;">Meetings</span>
+                    <span class="chip chip-neutral" style="margin-left:auto; font-size:10px;">This week</span>
+                  </div>
+                  <div class="sc-meet-item active-meet">
+                    <div class="sc-meet-dot" style="background:var(--orange);"></div>
+                    <div class="sc-meet-body">
+                      <div class="sc-meet-name">Weekly Product Sync</div>
+                      <div class="sc-meet-meta">Today · 10:00 · 8 people</div>
+                    </div>
+                    <span class="chip chip-green" style="font-size:9.5px;"><span class="d"></span>Ready</span>
+                  </div>
+                  <div class="sc-meet-item">
+                    <div class="sc-meet-dot" style="background:var(--yellow);"></div>
+                    <div class="sc-meet-body">
+                      <div class="sc-meet-name">Q2 Planning</div>
+                      <div class="sc-meet-meta">Yesterday · 14:00 · 12 people</div>
+                    </div>
+                    <span class="chip chip-blue" style="font-size:9.5px;"><span class="d"></span>3 tasks</span>
+                  </div>
+                  <div class="sc-meet-item">
+                    <div class="sc-meet-dot" style="background:var(--green);"></div>
+                    <div class="sc-meet-body">
+                      <div class="sc-meet-name">Marketing Sync</div>
+                      <div class="sc-meet-meta">Apr 22 · 11:00 · 6 people</div>
+                    </div>
+                    <span class="chip chip-orange" style="font-size:9.5px;"><span class="d"></span>2 open</span>
+                  </div>
+                  <div class="sc-meet-item">
+                    <div class="sc-meet-dot" style="background:var(--blue);"></div>
+                    <div class="sc-meet-body">
+                      <div class="sc-meet-name">Design Review</div>
+                      <div class="sc-meet-meta">Apr 21 · 15:30 · 5 people</div>
+                    </div>
+                  </div>
+                  <div class="sc-meet-item">
+                    <div class="sc-meet-dot" style="background:var(--text-4); opacity:.5;"></div>
+                    <div class="sc-meet-body">
+                      <div class="sc-meet-name" style="color:var(--text-2);">Sales Handoff</div>
+                      <div class="sc-meet-meta">Apr 20 · 09:00 · 4 people</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Detail col -->
+                <div class="sc-detail">
+                  <div class="sc-detail-head">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                      <div style="width:8px; height:8px; border-radius:2px; background:var(--orange);"></div>
+                      <div style="font-size:17px; font-weight:600; letter-spacing:-.015em;">Weekly Product Sync</div>
+                      <span class="chip chip-green" style="margin-left:auto;"><span class="d"></span>Summary ready</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px; font-size:11.5px; color:var(--text-2);">
+                      <span>Thu, Apr 24 · 10:00–10:48</span>
+                      <span style="color:var(--text-4)">·</span>
+                      <div style="display:flex; align-items:center; gap:-4px;" class="av-stack">
+                        <span class="av av-zh" style="width:18px; height:18px; font-size:8px;">ZH</span>
+                        <span class="av av-an" style="width:18px; height:18px; font-size:8px;">AN</span>
+                        <span class="av av-rc" style="width:18px; height:18px; font-size:8px;">RC</span>
+                        <span class="av av-de" style="width:18px; height:18px; font-size:8px;">DE</span>
+                        <span class="more" style="height:18px; font-size:9px;">+4</span>
+                      </div>
+                      <span>8 participants</span>
+                    </div>
+                  </div>
+                  <!-- Tabs -->
+                  <div class="sc-tabs">
+                    <span class="sc-tab active">Summary</span>
+                    <span class="sc-tab">Action items <span class="sc-tab-ct">7</span></span>
+                    <span class="sc-tab">Decisions <span class="sc-tab-ct">4</span></span>
+                    <span class="sc-tab">Transcript</span>
+                  </div>
+                  <!-- Content -->
+                  <div class="sc-content">
+                    <div class="sc-panel">
+                      <div class="sc-panel-h"><span class="sc-panel-ic" style="background:var(--indigo-bg); color:var(--indigo);">S</span>Summary</div>
+                      <p class="sc-p">The team aligned on Billing v2 timing and confirmed the rollout window for early May. Engineering raised concerns about rate-limit middleware being duplicated across three services. Pricing direction settled: $14/seat tier stays, free plan up to 10 seats added.</p>
+                    </div>
+                    <div class="sc-two-col">
+                      <div class="sc-panel">
+                        <div class="sc-panel-h"><span class="sc-panel-ic" style="background:var(--orange-bg); color:var(--orange-text);">D</span>Key decisions</div>
+                        <div class="sc-decision-row"><span class="sc-dec-num">01</span><span class="sc-dec-txt">Keep $14/seat, add free plan ≤ 10 users</span><span class="chip chip-green" style="font-size:9.5px;"><span class="d"></span>Approved</span></div>
+                        <div class="sc-decision-row"><span class="sc-dec-num">02</span><span class="sc-dec-txt">Postpone vendor migration to Q3</span><span class="chip chip-green" style="font-size:9.5px;"><span class="d"></span>Approved</span></div>
+                        <div class="sc-decision-row"><span class="sc-dec-num">03</span><span class="sc-dec-txt">Extract rate-limit into shared package</span><span class="chip chip-yellow" style="font-size:9.5px;"><span class="d"></span>Review</span></div>
+                      </div>
+                      <div class="sc-panel">
+                        <div class="sc-panel-h"><span class="sc-panel-ic" style="background:var(--blue-bg); color:var(--blue-text);">✓</span>Action items</div>
+                        <div class="sc-action-row"><span class="sc-chk"></span><span class="sc-act-txt">Draft pricing FAQ for sales</span><span class="av av-an" style="width:16px; height:16px; font-size:7.5px;">AN</span></div>
+                        <div class="sc-action-row"><span class="sc-chk"></span><span class="sc-act-txt">Confirm Stripe SLA before launch</span><span class="av av-sa" style="width:16px; height:16px; font-size:7.5px;">SA</span></div>
+                        <div class="sc-action-row"><span class="sc-chk"></span><span class="sc-act-txt">Audit billing webhook reliability</span><span class="av av-de" style="width:16px; height:16px; font-size:7.5px;">DE</span></div>
+                        <div class="sc-action-row"><span class="sc-chk"></span><span class="sc-act-txt">Update onboarding copy for new nav</span><span class="av av-rc" style="width:16px; height:16px; font-size:7.5px;">RC</span></div>
+                      </div>
+                    </div>
+                    <div class="sc-panel">
+                      <div class="sc-panel-h"><span class="sc-panel-ic" style="background:var(--green-bg); color:var(--green-text);">T</span>Transcript highlights<span style="margin-left:auto; font-size:10px; color:var(--text-3); font-family:'JetBrains Mono',monospace;">48:12</span></div>
+                      <div class="sc-ts-row"><span class="av av-zh" style="width:16px; height:16px; font-size:7.5px;">ZH</span><span class="sc-ts-who">Zheka</span><span class="sc-ts-time">00:18:42</span><span class="sc-ts-txt">"Let's keep the $14 tier and add a free plan up to 10 users — Anna, draft comms by Friday?"</span></div>
+                      <div class="sc-ts-row"><span class="av av-an" style="width:16px; height:16px; font-size:7.5px;">AN</span><span class="sc-ts-who">Anna</span><span class="sc-ts-time">00:34:08</span><span class="sc-ts-txt">"The rate-limit middleware is already used in three places — I can own this before Billing v2 lands."</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right panel: AI Insights / Upcoming -->
+                <div class="sc-right">
+                  <div class="sc-right-head">AI Insights</div>
+                  <div class="sc-insight">
+                    <div class="sc-insight-ic" style="background:var(--indigo-bg); color:var(--indigo);">AI</div>
+                    <div class="sc-insight-body">
+                      <div class="sc-insight-ttl">3 items need owners</div>
+                      <div class="sc-insight-sub">From today's sync — unassigned</div>
+                    </div>
+                  </div>
+                  <div class="sc-insight">
+                    <div class="sc-insight-ic" style="background:var(--orange-bg); color:var(--orange-text);">!</div>
+                    <div class="sc-insight-body">
+                      <div class="sc-insight-ttl">Blocked: Stripe SLA</div>
+                      <div class="sc-insight-sub">Billing v2 depends on this</div>
+                    </div>
+                  </div>
+                  <div class="sc-insight">
+                    <div class="sc-insight-ic" style="background:var(--green-bg); color:var(--green-text);">→</div>
+                    <div class="sc-insight-body">
+                      <div class="sc-insight-ttl">Routed to Linear</div>
+                      <div class="sc-insight-sub">3 issues created · ENG-1842</div>
+                    </div>
+                  </div>
+                  <div class="sc-right-head" style="margin-top:18px;">Upcoming</div>
+                  <div class="sc-upcoming">
+                    <div class="sc-up-time">Tomorrow · 10:00</div>
+                    <div class="sc-up-name">Q2 Planning — Engineering</div>
+                    <div style="display:flex; gap:4px; margin-top:5px;">
+                      <span class="chip chip-indigo" style="font-size:9.5px;"><span class="d"></span>Agenda ready</span>
+                    </div>
+                  </div>
+                  <div class="sc-upcoming" style="opacity:.6;">
+                    <div class="sc-up-time">Fri · 11:00</div>
+                    <div class="sc-up-name">Marketing Sync</div>
+                    <div style="display:flex; gap:4px; margin-top:5px;">
+                      <span class="chip chip-orange" style="font-size:9.5px;"><span class="d"></span>No agenda</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 3. AI SUMMARIES ========== -->
+  <section class="mid-section feat-section">
+    <div class="container">
+      <div class="feat-row">
+        <div class="feat-copy">
+          <div class="section-tag" style="margin-bottom:16px;"><span class="tag-dot" style="background:var(--green);"></span>AI summaries</div>
+          <h2 class="mid-h2">Summaries ready right after the meeting</h2>
+          <p class="feat-sub">Meetory turns long conversations into clear summaries with key topics, decisions, open questions, and next steps. No manual notes. No recap emails.</p>
+          <div class="feat-points">
+            <div class="feat-point"><span class="fp-dot" style="background:var(--green);"></span>Generated the moment the call ends</div>
+            <div class="feat-point"><span class="fp-dot" style="background:var(--indigo);"></span>Editable and shareable with one click</div>
+            <div class="feat-point"><span class="fp-dot" style="background:var(--blue);"></span>Linked to full transcript and recording</div>
+          </div>
+        </div>
+        <div class="feat-visual">
+          <div class="feat-card-wrap">
+            <div class="feat-card">
+              <div class="fc-head">
+                <div class="fc-dot" style="background:var(--blue);"></div>
+                <span class="fc-title">Customer Feedback Review</span>
+                <span class="chip chip-green" style="margin-left:auto;"><span class="d"></span>Summary ready</span>
+              </div>
+              <div class="fc-meta">Apr 24 · 14:00 · 45 min · 6 participants</div>
+              <div class="fc-section-lbl">Overview</div>
+              <div class="fc-text">The team reviewed NPS feedback from March. Three recurring pain points surfaced: slow onboarding, confusing pricing, and lack of team workspace features.</div>
+              <div class="fc-section-lbl">Key points</div>
+              <div class="fc-bullets">
+                <div class="fc-bullet"><span class="fc-bull-d"></span>Onboarding drop-off highest on day 3</div>
+                <div class="fc-bullet"><span class="fc-bull-d"></span>Pricing page confusion reported by 40% of trial users</div>
+                <div class="fc-bullet"><span class="fc-bull-d"></span>Team workspace request up 2× from last quarter</div>
+              </div>
+              <div class="fc-section-lbl">Decisions</div>
+              <div class="fc-decision-row"><span class="chip chip-green" style="font-size:9.5px;"><span class="d"></span>Approved</span><span class="fc-dec-txt">Redesign onboarding flow — deadline Q2 end</span></div>
+              <div class="fc-decision-row"><span class="chip chip-yellow" style="font-size:9.5px;"><span class="d"></span>Pending</span><span class="fc-dec-txt">A/B test new pricing page copy</span></div>
+              <div class="fc-section-lbl">Open questions</div>
+              <div class="fc-bullets">
+                <div class="fc-bullet"><span class="fc-bull-d" style="background:var(--orange);"></span>Who owns the pricing page redesign?</div>
+                <div class="fc-bullet"><span class="fc-bull-d" style="background:var(--orange);"></span>Timeline for team workspace feature?</div>
+              </div>
+              <div class="fc-section-lbl">Next steps</div>
+              <div class="fc-bullets">
+                <div class="fc-bullet"><span class="fc-bull-d" style="background:var(--indigo);"></span>Anna: draft onboarding redesign brief by Apr 28</div>
+                <div class="fc-bullet"><span class="fc-bull-d" style="background:var(--indigo);"></span>Roma: set up pricing A/B experiment in analytics</div>
+              </div>
+              <div class="fc-foot">
+                <span style="font-size:11px; color:var(--text-3);">Generated from transcript · 45:02</span>
+                <button class="btn btn-soft" style="padding:4px 10px; font-size:11px;">Share</button>
+                <button class="btn btn-soft" style="padding:4px 10px; font-size:11px;">Edit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 4. ACTION ITEMS ========== -->
+  <section class="mid-section feat-section feat-flip">
+    <div class="container">
+      <div class="feat-row">
+        <div class="feat-visual">
+          <div class="feat-card-wrap">
+            <!-- kanban-style task workspace -->
+            <div class="task-board">
+              <div class="task-col">
+                <div class="task-col-head"><span class="tc-dot" style="background:var(--text-3);"></span>To do<span class="tc-ct">3</span></div>
+                <div class="task-item">
+                  <div class="ti-name">Send pricing update to sales team</div>
+                  <div class="ti-meta"><span class="chip chip-orange" style="font-size:9.5px;"><span class="d"></span>Apr 28</span><span class="chip chip-orange" style="font-size:9.5px;"><span class="d"></span>High</span></div>
+                  <div class="ti-foot"><span class="chip chip-neutral" style="font-size:9.5px;">Product Sync</span><span style="flex:1;"></span><span class="av av-an" style="width:16px; height:16px; font-size:7.5px;">AN</span></div>
+                </div>
+                <div class="task-item">
+                  <div class="ti-name">Confirm Q2 timeline with leadership</div>
+                  <div class="ti-meta"><span class="chip chip-blue" style="font-size:9.5px;"><span class="d"></span>May 02</span></div>
+                  <div class="ti-foot"><span class="chip chip-neutral" style="font-size:9.5px;">Q2 Planning</span><span style="flex:1;"></span><span class="av av-zh" style="width:16px; height:16px; font-size:7.5px;">ZH</span></div>
+                </div>
+                <div class="task-item" style="opacity:.6;">
+                  <div class="ti-name">Audit billing webhook reliability</div>
+                  <div class="ti-meta"><span class="chip chip-blue" style="font-size:9.5px;"><span class="d"></span>May 05</span></div>
+                  <div class="ti-foot"><span class="chip chip-neutral" style="font-size:9.5px;">Product Sync</span><span style="flex:1;"></span><span class="av av-de" style="width:16px; height:16px; font-size:7.5px;">DE</span></div>
+                </div>
+              </div>
+              <div class="task-col">
+                <div class="task-col-head"><span class="tc-dot" style="background:var(--blue);"></span>In progress<span class="tc-ct">2</span></div>
+                <div class="task-item ti-selected">
+                  <div class="ti-name">Review onboarding flow redesign</div>
+                  <div class="ti-meta"><span class="chip chip-blue" style="font-size:9.5px;"><span class="d"></span>In progress</span><span class="chip chip-orange" style="font-size:9.5px;"><span class="d"></span>High</span></div>
+                  <div class="ti-foot"><span class="chip chip-neutral" style="font-size:9.5px;">Customer Review</span><span style="flex:1;"></span><span class="av av-rc" style="width:16px; height:16px; font-size:7.5px;">RC</span></div>
+                  <!-- source quote -->
+                  <div class="ti-quote">"Roma: review the onboarding flow and flag what's causing drop-off on day 3."</div>
+                </div>
+                <div class="task-item">
+                  <div class="ti-name">Draft comms for free plan launch</div>
+                  <div class="ti-meta"><span class="chip chip-blue" style="font-size:9.5px;"><span class="d"></span>In progress</span></div>
+                  <div class="ti-foot"><span class="chip chip-neutral" style="font-size:9.5px;">Product Sync</span><span style="flex:1;"></span><span class="av av-an" style="width:16px; height:16px; font-size:7.5px;">AN</span></div>
+                </div>
+              </div>
+              <div class="task-col">
+                <div class="task-col-head"><span class="tc-dot" style="background:var(--green);"></span>Done<span class="tc-ct">4</span></div>
+                <div class="task-item" style="opacity:.45;">
+                  <div class="ti-name" style="text-decoration:line-through; color:var(--text-2);">Update Linear issue labels</div>
+                  <div class="ti-foot"><span class="chip chip-neutral" style="font-size:9.5px;">Q2 Planning</span><span style="flex:1;"></span><span class="av av-de" style="width:16px; height:16px; font-size:7.5px;">DE</span></div>
+                </div>
+                <div class="task-item" style="opacity:.45;">
+                  <div class="ti-name" style="text-decoration:line-through; color:var(--text-2);">Confirm Zoom integration scopes</div>
+                  <div class="ti-foot"><span class="chip chip-neutral" style="font-size:9.5px;">Design Review</span><span style="flex:1;"></span><span class="av av-vi" style="width:16px; height:16px; font-size:7.5px;">VI</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="feat-copy">
+          <div class="section-tag" style="margin-bottom:16px;"><span class="tag-dot" style="background:var(--indigo);"></span>Action items</div>
+          <h2 class="mid-h2">Turn discussion into assigned work</h2>
+          <p class="feat-sub">Meetory extracts action items, assigns owners, adds due dates, and keeps follow-up visible after the meeting ends. Tasks route directly to Linear, Jira, or Notion.</p>
+          <div class="feat-points">
+            <div class="feat-point"><span class="fp-dot" style="background:var(--indigo);"></span>Owners and due dates set automatically</div>
+            <div class="feat-point"><span class="fp-dot" style="background:var(--blue);"></span>Every task links back to the source quote</div>
+            <div class="feat-point"><span class="fp-dot" style="background:var(--green);"></span>Syncs bidirectionally with your issue tracker</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 5. DECISIONS ========== -->
+  <section class="mid-section feat-section">
+    <div class="container">
+      <div class="feat-row">
+        <div class="feat-copy">
+          <div class="section-tag" style="margin-bottom:16px;"><span class="tag-dot" style="background:var(--orange);"></span>Decisions</div>
+          <h2 class="mid-h2">Every decision stays visible</h2>
+          <p class="feat-sub">Meetory highlights what was agreed, who was involved, and where the context came from — so teams do not repeat the same conversation twice.</p>
+          <div class="feat-points">
+            <div class="feat-point"><span class="fp-dot" style="background:var(--orange);"></span>Confidence-scored and confirmed by you</div>
+            <div class="feat-point"><span class="fp-dot" style="background:var(--yellow);"></span>Linked to participants and source recording</div>
+            <div class="feat-point"><span class="fp-dot" style="background:var(--blue);"></span>Filterable across every meeting series</div>
+          </div>
+        </div>
+        <div class="feat-visual">
+          <div class="feat-card-wrap">
+            <div class="decision-log">
+              <div class="dl-filters">
+                <span class="dl-filter active">All</span>
+                <span class="dl-filter">Product</span>
+                <span class="dl-filter">Sales</span>
+                <span class="dl-filter">Operations</span>
+                <span class="dl-filter">Client calls</span>
+              </div>
+              <div class="dl-card">
+                <div class="dl-card-head">
+                  <span class="chip chip-green"><span class="d"></span>Approved</span>
+                  <span style="flex:1;"></span>
+                  <span class="dl-date">Apr 24</span>
+                </div>
+                <div class="dl-card-title">Keep free plan limited to 10 seats, no time limit.</div>
+                <div class="dl-card-meta">
+                  <span class="chip chip-orange" style="font-size:9.5px;"><span class="d"></span>Product Sync</span>
+                  <div class="av-stack" style="margin-left:4px;">
+                    <span class="av av-zh" style="width:16px; height:16px; font-size:7.5px;">ZH</span>
+                    <span class="av av-an" style="width:16px; height:16px; font-size:7.5px;">AN</span>
+                    <span class="av av-rc" style="width:16px; height:16px; font-size:7.5px;">RC</span>
+                  </div>
+                  <span class="dl-action-tag">2 action items</span>
+                </div>
+                <div class="dl-quote">"Let's keep the free plan unlimited in time but capped at 10 users — Anna, draft the comms."</div>
+              </div>
+              <div class="dl-card">
+                <div class="dl-card-head">
+                  <span class="chip chip-green"><span class="d"></span>Approved</span>
+                  <span style="flex:1;"></span>
+                  <span class="dl-date">Apr 22</span>
+                </div>
+                <div class="dl-card-title">Move onboarding redesign to next sprint.</div>
+                <div class="dl-card-meta">
+                  <span class="chip chip-blue" style="font-size:9.5px;"><span class="d"></span>Design Review</span>
+                  <div class="av-stack" style="margin-left:4px;">
+                    <span class="av av-de" style="width:16px; height:16px; font-size:7.5px;">DE</span>
+                    <span class="av av-rc" style="width:16px; height:16px; font-size:7.5px;">RC</span>
+                  </div>
+                  <span class="dl-action-tag">1 action item</span>
+                </div>
+              </div>
+              <div class="dl-card">
+                <div class="dl-card-head">
+                  <span class="chip chip-yellow"><span class="d"></span>Needs review</span>
+                  <span style="flex:1;"></span>
+                  <span class="dl-date">Apr 20</span>
+                </div>
+                <div class="dl-card-title">Use product-led demo flow for new teams onboarding.</div>
+                <div class="dl-card-meta">
+                  <span class="chip chip-green" style="font-size:9.5px;"><span class="d"></span>Marketing Sync</span>
+                  <div class="av-stack" style="margin-left:4px;">
+                    <span class="av av-sa" style="width:16px; height:16px; font-size:7.5px;">SA</span>
+                    <span class="av av-zh" style="width:16px; height:16px; font-size:7.5px;">ZH</span>
+                  </div>
+                  <span class="dl-action-tag">3 action items</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 6. SEARCH ========== -->
+  <section class="mid-section feat-section feat-flip">
+    <div class="container">
+      <div class="feat-row">
+        <div class="feat-visual">
+          <div class="feat-card-wrap">
+            <div class="search-ui">
+              <div class="sui-bar">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M13 13l-3-3"/></svg>
+                <span style="color:var(--text-0);">pricing discussion</span>
+                <span style="flex:1;"></span>
+                <span class="kbd-tag" style="font-size:10px;">⌘K</span>
+              </div>
+              <div class="sui-filters">
+                <span class="sui-filter active">All</span>
+                <span class="sui-filter">Date</span>
+                <span class="sui-filter">Team</span>
+                <span class="sui-filter">Decision</span>
+                <span class="sui-filter">Action item</span>
+                <span class="sui-filter">Owner</span>
+              </div>
+              <div class="sui-group">
+                <div class="sui-group-head"><span class="chip chip-orange" style="font-size:9.5px;"><span class="d"></span>Weekly Product Sync</span><span style="color:var(--text-3); font-size:10.5px; margin-left:6px;">Apr 24 · 2 results</span></div>
+                <div class="sui-result">
+                  <div class="sui-result-type"><span class="chip chip-green" style="font-size:9.5px;"><span class="d"></span>Decision found</span></div>
+                  <div class="sui-result-ttl">Pricing changes approved for beta teams</div>
+                  <div class="sui-result-snip">"We'll keep the <mark>$14/seat tier</mark> and add a free plan — this was the <mark>pricing decision</mark> we discussed last sprint too."</div>
+                  <div class="sui-result-meta"><span class="av av-zh" style="width:14px; height:14px; font-size:7px;">ZH</span><span style="color:var(--text-3); font-size:10.5px;">Zheka · 00:18:42</span><span style="margin-left:auto; color:var(--indigo); font-size:10.5px;">▶ Play</span></div>
+                </div>
+                <div class="sui-result">
+                  <div class="sui-result-type"><span class="chip chip-blue" style="font-size:9.5px;"><span class="d"></span>Action item</span></div>
+                  <div class="sui-result-ttl">Draft updated <mark>pricing</mark> FAQ for sales team</div>
+                  <div class="sui-result-meta"><span class="av av-an" style="width:14px; height:14px; font-size:7px;">AN</span><span style="color:var(--text-3); font-size:10.5px;">Anna K. · Apr 28</span><span class="chip chip-blue" style="margin-left:auto; font-size:9.5px;"><span class="d"></span>In progress</span></div>
+                </div>
+              </div>
+              <div class="sui-group" style="opacity:.7;">
+                <div class="sui-group-head"><span class="chip chip-blue" style="font-size:9.5px;"><span class="d"></span>Client Onboarding Call</span><span style="color:var(--text-3); font-size:10.5px; margin-left:6px;">Apr 20 · 1 result</span></div>
+                <div class="sui-result">
+                  <div class="sui-result-type"><span class="chip chip-yellow" style="font-size:9.5px;"><span class="d"></span>Transcript</span></div>
+                  <div class="sui-result-ttl">Client raised concerns about <mark>pricing</mark> transparency</div>
+                  <div class="sui-result-meta"><span class="av av-sa" style="width:14px; height:14px; font-size:7px;">SA</span><span style="color:var(--text-3); font-size:10.5px;">Sarah · 00:08:15</span><span style="margin-left:auto; color:var(--indigo); font-size:10.5px;">▶ Play</span></div>
+                </div>
+              </div>
+              <div class="sui-group" style="opacity:.45;">
+                <div class="sui-group-head"><span class="chip chip-neutral" style="font-size:9.5px;">Leadership Review</span><span style="color:var(--text-3); font-size:10.5px; margin-left:6px;">Apr 17 · 1 result</span></div>
+                <div class="sui-result">
+                  <div class="sui-result-type"><span class="chip chip-orange" style="font-size:9.5px;"><span class="d"></span>Decision</span></div>
+                  <div class="sui-result-ttl">Lock <mark>pricing</mark> model for H1 — no changes until June</div>
+                  <div class="sui-result-meta"><span class="av av-zh" style="width:14px; height:14px; font-size:7px;">ZH</span><span style="color:var(--text-3); font-size:10.5px;">Zheka · 00:44:01</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="feat-copy">
+          <div class="section-tag" style="margin-bottom:16px;"><span class="tag-dot" style="background:var(--yellow);"></span>Search</div>
+          <h2 class="mid-h2">Search every meeting your team has ever had</h2>
+          <p class="feat-sub">Find summaries, transcript moments, decisions, and action items across your meeting history in seconds. Jump straight to the source clip.</p>
+          <div class="feat-points">
+            <div class="feat-point"><span class="fp-dot" style="background:var(--yellow);"></span>Full-text across transcripts, summaries, decisions</div>
+            <div class="feat-point"><span class="fp-dot" style="background:var(--blue);"></span>Results grouped by meeting with context</div>
+            <div class="feat-point"><span class="fp-dot" style="background:var(--green);"></span>Jump directly to the recording moment</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SHARED MID-SECTION STYLES (injected inline so they apply immediately)
+  ============================================================ -->
+  <style>
+    .mid-section { padding: 100px 0; position: relative; }
+    .feat-section { padding: 80px 0; }
+    .feat-section + .feat-section { padding-top: 40px; }
+
+    .section-tag {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 4px 10px; background: var(--bg-2);
+      border: 1px solid var(--border); border-radius: 100px;
+      font-size: 11.5px; color: var(--text-2);
+    }
+    .tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--indigo); }
+    .mid-h2 {
+      font-size: 40px; font-weight: 600;
+      letter-spacing: -0.025em; line-height: 1.1;
+      margin: 12px 0 14px; text-wrap: balance;
+    }
+    .mid-sub {
+      font-size: 16px; color: var(--text-2); line-height: 1.6;
+      max-width: 600px; text-wrap: pretty; margin: 0;
+    }
+
+    /* Problem cards */
+    .prob-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+      margin-bottom: 40px;
+    }
+    .prob-card {
+      background: var(--bg-1); border: 1px solid var(--border-soft);
+      border-radius: 14px; padding: 22px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .prob-icon {
+      width: 34px; height: 34px; border-radius: 9px;
+      display: grid; place-items: center; margin-bottom: 4px;
+    }
+    .prob-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+    .prob-desc { font-size: 13px; color: var(--text-2); line-height: 1.55; }
+    .prob-art { margin-top: 12px; background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 9px; padding: 14px 12px; min-height: 80px; }
+    .prob-scatter { position: relative; height: 80px; }
+    .scatter-tag { position: absolute; padding: 3px 9px; border-radius: 100px; font-size: 10.5px; font-weight: 500; white-space: nowrap; }
+    .missed-row { display: flex; align-items: center; gap: 7px; }
+    .miss-check { width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--border-strong); flex-shrink: 0; }
+    .miss-text { font-size: 12px; color: var(--text-1); flex: 1; }
+    .miss-who { font-size: 11px; color: var(--text-3); }
+
+    /* Before/After */
+    .ba-wrap { display: grid; grid-template-columns: 1fr 40px 1fr; gap: 0; align-items: center; background: var(--bg-1); border: 1px solid var(--border-soft); border-radius: 14px; overflow: hidden; }
+    .ba-col { padding: 26px; }
+    .ba-arrow { display: grid; place-items: center; font-size: 22px; color: var(--text-3); }
+    .ba-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-1); margin-bottom: 14px; }
+    .ba-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .ba-card { background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .ba-row { display: flex; align-items: center; gap: 9px; font-size: 12px; }
+    .ba-icon { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-size: 10px; font-weight: 600; flex-shrink: 0; }
+    .ba-name { flex: 1; color: var(--text-1); }
+    .ba-meta { font-size: 10.5px; color: var(--text-3); white-space: nowrap; }
+    .ba-panel-head { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+    .ba-panel-ico { width: 20px; height: 20px; border-radius: 5px; display: grid; place-items: center; font-size: 9.5px; font-weight: 600; }
+    .ba-stat { display: flex; flex-direction: column; background: var(--bg-3); border: 1px solid var(--border-soft); border-radius: 8px; padding: 8px 12px; font-size: 11px; color: var(--text-2); align-items: center; gap: 2px; }
+    .ba-stat-num { font-size: 18px; font-weight: 600; color: var(--text-0); letter-spacing: -0.02em; }
+
+    /* Feature section layout */
+    .feat-row { display: grid; grid-template-columns: 1fr 1.1fr; gap: 80px; align-items: center; }
+    .feat-flip .feat-row { grid-template-columns: 1.1fr 1fr; }
+    .feat-sub { font-size: 15px; color: var(--text-2); line-height: 1.6; margin: 14px 0 20px; text-wrap: pretty; }
+    .feat-points { display: flex; flex-direction: column; gap: 9px; }
+    .feat-point { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; color: var(--text-1); line-height: 1.45; }
+    .fp-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+    .feat-card-wrap { background: var(--bg-1); border: 1px solid var(--border); border-radius: 14px; padding: 6px; box-shadow: 0 30px 70px -30px rgba(0,0,0,0.65); }
+    .feat-card { background: var(--bg-0); border: 1px solid var(--border-soft); border-radius: 10px; padding: 16px; }
+
+    /* Summary card */
+    .fc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .fc-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+    .fc-title { font-size: 13.5px; font-weight: 600; color: var(--text-0); }
+    .fc-meta { font-size: 10.5px; color: var(--text-3); margin-bottom: 12px; font-family: 'JetBrains Mono', monospace; }
+    .fc-section-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-3); font-weight: 500; margin: 10px 0 5px; }
+    .fc-text { font-size: 12px; color: var(--text-1); line-height: 1.55; }
+    .fc-bullets { display: flex; flex-direction: column; gap: 4px; }
+    .fc-bullet { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--text-1); }
+    .fc-bull-d { width: 5px; height: 5px; border-radius: 50%; background: var(--text-3); margin-top: 6px; flex-shrink: 0; }
+    .fc-decision-row { display: flex; align-items: flex-start; gap: 7px; margin-bottom: 5px; font-size: 12px; }
+    .fc-dec-txt { color: var(--text-1); line-height: 1.45; flex: 1; }
+    .fc-foot { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-soft); }
+
+    /* Task board */
+    .task-board { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .task-col { background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px 10px; }
+    .task-col-head { display: flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 600; color: var(--text-1); margin-bottom: 10px; }
+    .tc-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .tc-ct { margin-left: auto; font-size: 10.5px; color: var(--text-3); font-weight: 400; }
+    .task-item { background: var(--bg-1); border: 1px solid var(--border-soft); border-radius: 8px; padding: 10px 10px 8px; margin-bottom: 7px; }
+    .task-item:last-child { margin-bottom: 0; }
+    .ti-selected { border-color: var(--indigo-border); background: rgba(91,108,245,0.04); }
+    .ti-name { font-size: 12px; color: var(--text-0); line-height: 1.4; margin-bottom: 6px; }
+    .ti-meta { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+    .ti-foot { display: flex; align-items: center; gap: 4px; }
+    .ti-quote { margin-top: 8px; padding: 7px 9px; background: var(--bg-2); border: 1px solid var(--border-soft); border-left: 2px solid var(--indigo); border-radius: 5px; font-size: 11px; color: var(--text-2); line-height: 1.5; }
+
+    /* Decision log */
+    .decision-log { display: flex; flex-direction: column; gap: 0; }
+    .dl-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .dl-filter { padding: 4px 10px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 100px; font-size: 11.5px; color: var(--text-2); cursor: pointer; }
+    .dl-filter.active { background: var(--bg-3); color: var(--text-0); border-color: var(--border-strong); }
+    .dl-card { background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 10px; padding: 13px 14px; margin-bottom: 8px; }
+    .dl-card:last-child { margin-bottom: 0; }
+    .dl-card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .dl-date { font-size: 10.5px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; }
+    .dl-card-title { font-size: 13px; font-weight: 500; color: var(--text-0); line-height: 1.4; margin-bottom: 8px; }
+    .dl-card-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 7px; }
+    .dl-action-tag { margin-left: auto; font-size: 10.5px; color: var(--text-3); }
+    .dl-quote { font-size: 11.5px; color: var(--text-2); line-height: 1.5; padding: 8px 10px; background: var(--bg-3); border-radius: 6px; border-left: 2px solid var(--orange); font-style: italic; }
+
+    /* Search UI */
+    .search-ui { display: flex; flex-direction: column; gap: 0; }
+    .sui-bar { display: flex; align-items: center; gap: 10px; background: var(--bg-2); border: 1px solid var(--border-strong); border-radius: 9px; padding: 10px 13px; margin-bottom: 10px; font-size: 13px; color: var(--text-1); }
+    .sui-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .sui-filter { padding: 4px 10px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 100px; font-size: 11.5px; color: var(--text-2); cursor: pointer; }
+    .sui-filter.active { background: var(--indigo-bg); color: #9ba8ff; border-color: var(--indigo-border); }
+    .sui-group { margin-bottom: 14px; }
+    .sui-group:last-child { margin-bottom: 0; }
+    .sui-group-head { margin-bottom: 7px; display: flex; align-items: center; }
+    .sui-result { background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 9px; padding: 11px 13px; margin-bottom: 6px; }
+    .sui-result:last-child { margin-bottom: 0; }
+    .sui-result-type { margin-bottom: 5px; }
+    .sui-result-ttl { font-size: 12.5px; color: var(--text-0); font-weight: 500; margin-bottom: 5px; line-height: 1.4; }
+    .sui-result-ttl mark, .sui-result-snip mark { background: rgba(247,201,72,0.18); color: var(--yellow-text); padding: 0 2px; border-radius: 2px; font-weight: 600; }
+    .sui-result-snip { font-size: 12px; color: var(--text-2); line-height: 1.5; margin-bottom: 7px; }
+    .sui-result-meta { display: flex; align-items: center; gap: 7px; }
+    .kbd-tag { padding: 1px 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; }
+
+    /* Product showcase frame */
+    .showcase-frame { background: var(--bg-1); border: 1px solid var(--border); border-radius: 14px; padding: 7px; box-shadow: 0 30px 80px -30px rgba(0,0,0,0.6); overflow: hidden; }
+    .showcase-inner { background: var(--bg-0); border-radius: 9px; border: 1px solid var(--border-soft); overflow: hidden; }
+    .showcase-app { display: grid; grid-template-columns: 180px 1fr; }
+    .sc-side { background: var(--bg-1); border-right: 1px solid var(--border-soft); padding: 14px 10px; display: flex; flex-direction: column; gap: 2px; }
+    .sc-logo { display: flex; align-items: center; gap: 8px; padding: 4px 8px 14px; font-size: 13px; font-weight: 600; }
+    .sc-nav-item { display: flex; align-items: center; gap: 8px; padding: 7px 9px; border-radius: 6px; color: var(--text-1); font-size: 12.5px; }
+    .sc-nav-item svg { flex-shrink: 0; color: var(--text-2); }
+    .sc-nav-item.active { background: var(--bg-3); color: var(--text-0); }
+    .sc-nav-item.active svg { color: var(--indigo); }
+    .sc-badge { margin-left: auto; font-size: 10.5px; color: var(--text-3); }
+    .sc-topbar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border-soft); }
+    .sc-search { display: flex; align-items: center; gap: 8px; background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 7px; padding: 6px 10px; font-size: 12px; color: var(--text-3); flex: 1; max-width: 360px; }
+    .sc-search .kbd-tag { margin-left: auto; }
+    .sc-body { display: grid; grid-template-columns: 220px 1fr 190px; min-height: 480px; }
+    .sc-list { border-right: 1px solid var(--border-soft); padding: 12px 10px; }
+    .sc-list-head { display: flex; align-items: center; gap: 8px; padding: 4px 8px 12px; }
+    .sc-meet-item { display: flex; align-items: center; gap: 9px; padding: 9px 8px; border-radius: 7px; cursor: pointer; margin-bottom: 2px; }
+    .sc-meet-item:hover { background: var(--bg-2); }
+    .active-meet { background: var(--bg-3) !important; }
+    .sc-meet-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+    .sc-meet-body { flex: 1; min-width: 0; }
+    .sc-meet-name { font-size: 12.5px; color: var(--text-0); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sc-meet-meta { font-size: 10.5px; color: var(--text-3); margin-top: 1px; }
+    .sc-detail { padding: 14px 16px; overflow: hidden; }
+    .sc-detail-head { padding-bottom: 12px; border-bottom: 1px solid var(--border-soft); margin-bottom: 0; }
+    .sc-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border-soft); margin: 0 0 14px; }
+    .sc-tab { padding: 9px 12px; font-size: 12px; color: var(--text-2); cursor: pointer; border-bottom: 1.5px solid transparent; margin-bottom: -1px; display: flex; align-items: center; gap: 5px; }
+    .sc-tab.active { color: var(--text-0); border-bottom-color: var(--indigo); }
+    .sc-tab-ct { background: var(--bg-3); padding: 0 5px; border-radius: 100px; font-size: 9.5px; color: var(--text-3); }
+    .sc-tab.active .sc-tab-ct { background: var(--indigo-bg); color: var(--indigo); }
+    .sc-content { display: flex; flex-direction: column; gap: 10px; }
+    .sc-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sc-panel { background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 9px; padding: 12px 13px; }
+    .sc-panel-h { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; font-size: 12px; font-weight: 600; color: var(--text-0); }
+    .sc-panel-ic { width: 20px; height: 20px; border-radius: 5px; display: grid; place-items: center; font-size: 9.5px; font-weight: 600; }
+    .sc-p { font-size: 12px; color: var(--text-1); line-height: 1.55; margin: 0; }
+    .sc-decision-row { display: flex; align-items: center; gap: 7px; padding: 5px 0; border-top: 1px solid var(--border-soft); font-size: 11.5px; }
+    .sc-decision-row:first-of-type { border-top: 0; padding-top: 0; }
+    .sc-dec-num { color: var(--text-3); font-family: 'JetBrains Mono',monospace; font-size: 10px; }
+    .sc-dec-txt { flex: 1; color: var(--text-1); font-size: 11.5px; }
+    .sc-action-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-top: 1px solid var(--border-soft); }
+    .sc-action-row:first-of-type { border-top: 0; }
+    .sc-chk { width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--border-strong); flex-shrink: 0; }
+    .sc-act-txt { flex: 1; font-size: 11.5px; color: var(--text-0); }
+    .sc-ts-row { display: flex; align-items: flex-start; gap: 7px; padding: 6px 0; border-top: 1px solid var(--border-soft); }
+    .sc-ts-row:first-of-type { border-top: 0; }
+    .sc-ts-who { font-size: 11px; color: var(--text-1); font-weight: 500; white-space: nowrap; }
+    .sc-ts-time { font-family: 'JetBrains Mono',monospace; font-size: 10px; color: var(--text-3); white-space: nowrap; }
+    .sc-ts-txt { flex: 1; font-size: 11.5px; color: var(--text-2); line-height: 1.45; }
+    .sc-right { border-left: 1px solid var(--border-soft); padding: 12px 12px; }
+    .sc-right-head { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); font-weight: 500; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-soft); }
+    .sc-insight { display: flex; align-items: flex-start; gap: 9px; padding: 8px 0; border-top: 1px solid var(--border-soft); }
+    .sc-insight:first-of-type { border-top: 0; }
+    .sc-insight-ic { width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center; font-size: 10px; font-weight: 600; flex-shrink: 0; }
+    .sc-insight-ttl { font-size: 12px; color: var(--text-0); font-weight: 500; margin-bottom: 2px; }
+    .sc-insight-sub { font-size: 10.5px; color: var(--text-3); }
+    .sc-upcoming { background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+    .sc-up-time { font-size: 10.5px; color: var(--text-3); font-family: 'JetBrains Mono',monospace; margin-bottom: 3px; }
+    .sc-up-name { font-size: 12px; color: var(--text-0); font-weight: 500; }
+
+    /* Responsive middle */
+    @media (max-width: 1000px) {
+      .feat-row, .feat-flip .feat-row { grid-template-columns: 1fr; gap: 40px; }
+      .feat-flip .feat-row .feat-visual { order: -1; }
+      .mid-h2 { font-size: 32px; }
+      .prob-grid { grid-template-columns: 1fr; }
+      .ba-wrap { grid-template-columns: 1fr; }
+      .ba-arrow { display: none; }
+      .task-board { grid-template-columns: 1fr; }
+      .sc-body { grid-template-columns: 1fr; }
+      .sc-list, .sc-right { display: none; }
+      .sc-two-col { grid-template-columns: 1fr; }
+      .showcase-app { grid-template-columns: 1fr; }
+      .sc-side { display: none; }
+    }
+  </style>
+
+    </div>
+  </section>
+
+  <!-- ========== HOW IT WORKS ========== -->
+  <section style="padding: 100px 0; background: linear-gradient(to bottom, var(--bg-0), var(--bg-1) 40%, var(--bg-1) 60%, var(--bg-0));">
+    <div class="container">
+      <div style="max-width:640px; margin:0 auto 60px; text-align:center;">
+        <div class="section-tag" style="justify-content:center; margin-bottom:16px;"><span class="tag-dot" style="background:var(--indigo);"></span>How it works</div>
+        <h2 class="mid-h2">From meeting to follow-through in four steps</h2>
+        <p class="mid-sub">Meetory fits into how your team already works and turns every conversation into structured output.</p>
+      </div>
+
+      <!-- Steps with connecting line -->
+      <div class="hiw-grid">
+        <!-- connector line -->
+        <div class="hiw-line"></div>
+
+        <!-- Step 01 -->
+        <div class="hiw-step">
+          <div class="hiw-num">01</div>
+          <div class="hiw-card">
+            <div class="hiw-card-head">
+              <div class="hiw-ic" style="background:var(--indigo-bg); color:var(--indigo);">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6h12M5 2v3M11 2v3"/></svg>
+              </div>
+              <span class="hiw-label">Connect</span>
+            </div>
+            <p class="hiw-desc">Connect your calendar or add meeting content manually. Meetory syncs with Google Calendar, Zoom, and Meet automatically.</p>
+            <!-- mini visual -->
+            <div class="hiw-mini">
+              <div class="hiw-mini-row" style="background:var(--indigo-bg); border-color:var(--indigo-border);">
+                <span class="hiw-mini-ic" style="background:var(--indigo-bg); color:var(--indigo);">C</span>
+                <span class="hiw-mini-txt">Google Calendar connected</span>
+                <span class="chip chip-green" style="font-size:9.5px; margin-left:auto;"><span class="d"></span>Synced</span>
+              </div>
+              <div class="hiw-mini-row">
+                <span class="hiw-mini-ic" style="background:rgba(95,168,255,.15); color:var(--blue-text);">Z</span>
+                <span class="hiw-mini-txt">Zoom integration</span>
+                <span class="chip chip-green" style="font-size:9.5px; margin-left:auto;"><span class="d"></span>Active</span>
+              </div>
+              <div class="hiw-mini-row" style="opacity:.5;">
+                <span class="hiw-mini-ic" style="background:var(--bg-3); color:var(--text-3);">M</span>
+                <span class="hiw-mini-txt">Google Meet</span>
+                <span class="chip chip-blue" style="font-size:9.5px; margin-left:auto;"><span class="d"></span>Available</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 02 -->
+        <div class="hiw-step">
+          <div class="hiw-num">02</div>
+          <div class="hiw-card">
+            <div class="hiw-card-head">
+              <div class="hiw-ic" style="background:var(--green-bg); color:var(--green-text);">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="5.5"/><path d="M6.5 5.5l5 2.5-5 2.5V5.5z" fill="currentColor" stroke="none"/></svg>
+              </div>
+              <span class="hiw-label">Capture</span>
+            </div>
+            <p class="hiw-desc">Meetory records, imports, or processes the meeting conversation. Real-time transcription — no one needs to take notes.</p>
+            <div class="hiw-mini">
+              <div style="font-size:10px; color:var(--text-3); font-family:'JetBrains Mono',monospace; margin-bottom:7px; display:flex; align-items:center; gap:7px;"><span style="width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px rgba(74,222,128,.2); flex-shrink:0;"></span>Recording · 00:18:34</div>
+              <div class="ts-mini-row"><span class="av av-zh" style="width:14px;height:14px;font-size:7px;">ZH</span><span style="font-size:11px; color:var(--text-1);">"Let's confirm the pricing direction…"</span></div>
+              <div class="ts-mini-row" style="opacity:.7;"><span class="av av-an" style="width:14px;height:14px;font-size:7px;">AN</span><span style="font-size:11px; color:var(--text-1);">"I'll take the comms brief by Friday."</span></div>
+              <div class="ts-mini-row" style="opacity:.4;"><span class="av av-rc" style="width:14px;height:14px;font-size:7px;">RC</span><span style="font-size:11px; color:var(--text-2);">…</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 03 -->
+        <div class="hiw-step">
+          <div class="hiw-num">03</div>
+          <div class="hiw-card">
+            <div class="hiw-card-head">
+              <div class="hiw-ic" style="background:var(--blue-bg); color:var(--blue-text);">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><path d="M9 11.5h5M11.5 9v5"/></svg>
+              </div>
+              <span class="hiw-label">Organize</span>
+            </div>
+            <p class="hiw-desc">AI turns the meeting into a summary, decisions, and action items. Ready before the next calendar block.</p>
+            <div class="hiw-mini">
+              <div class="hiw-output-row"><span class="hiw-out-ic" style="background:var(--indigo-bg); color:var(--indigo);">S</span><span class="hiw-out-lbl">Summary generated</span><span class="chip chip-green" style="font-size:9px; margin-left:auto;"><span class="d"></span>Done</span></div>
+              <div class="hiw-output-row"><span class="hiw-out-ic" style="background:var(--orange-bg); color:var(--orange-text);">D</span><span class="hiw-out-lbl">4 decisions captured</span><span class="chip chip-green" style="font-size:9px; margin-left:auto;"><span class="d"></span>Done</span></div>
+              <div class="hiw-output-row"><span class="hiw-out-ic" style="background:var(--blue-bg); color:var(--blue-text);">✓</span><span class="hiw-out-lbl">7 action items created</span><span class="chip chip-green" style="font-size:9px; margin-left:auto;"><span class="d"></span>Done</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 04 -->
+        <div class="hiw-step">
+          <div class="hiw-num">04</div>
+          <div class="hiw-card">
+            <div class="hiw-card-head">
+              <div class="hiw-ic" style="background:var(--yellow-bg); color:var(--yellow-text);">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 4l2 2 4-4"/><path d="M3 8l2 2 4-4"/><path d="M3 12l2 2 4-4"/></svg>
+              </div>
+              <span class="hiw-label">Follow through</span>
+            </div>
+            <p class="hiw-desc">Your team tracks tasks, searches history, and keeps context visible. Nothing falls between the cracks.</p>
+            <div class="hiw-mini">
+              <div class="hiw-ft-row"><span class="hiw-ft-check done"></span><span style="font-size:11.5px; color:var(--text-2); text-decoration:line-through;">Draft pricing FAQ</span><span class="av av-an" style="width:14px;height:14px;font-size:7px;margin-left:auto;">AN</span></div>
+              <div class="hiw-ft-row"><span class="hiw-ft-check in-progress"></span><span style="font-size:11.5px; color:var(--text-0);">Confirm Stripe SLA</span><span class="av av-sa" style="width:14px;height:14px;font-size:7px;margin-left:auto;">SA</span></div>
+              <div class="hiw-ft-row"><span class="hiw-ft-check"></span><span style="font-size:11.5px; color:var(--text-1);">Audit webhook reliability</span><span class="av av-de" style="width:14px;height:14px;font-size:7px;margin-left:auto;">DE</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== INTEGRATIONS ========== -->
+  <section style="padding: 100px 0;">
+    <div class="container">
+      <div style="max-width:620px; margin:0 auto 52px; text-align:center;">
+        <div class="section-tag" style="justify-content:center; margin-bottom:16px;"><span class="tag-dot" style="background:var(--blue);"></span>Integrations</div>
+        <h2 class="mid-h2">Works with the tools your team already uses</h2>
+        <p class="mid-sub">Connect meetings, calendars, notes, and follow-up workflows so Meetory becomes the place where meeting outcomes stay organized.</p>
+      </div>
+
+      <div class="int-grid">
+        <!-- Meetings category -->
+        <div class="int-cat">
+          <div class="int-cat-lbl">Meetings</div>
+          <div class="int-apps">
+            <div class="int-app">
+              <div class="int-app-ic" style="background:rgba(95,168,255,.12);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="var(--blue-text)" stroke-width="1.5"/><path d="M16 9l5-3v12l-5-3V9z" fill="var(--blue-text)" opacity=".6"/></svg>
+              </div>
+              <span class="int-app-name">Zoom</span>
+              <span class="int-status available">Available</span>
+            </div>
+            <div class="int-app">
+              <div class="int-app-ic" style="background:rgba(74,222,128,.1);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="var(--green-text)" stroke-width="1.5"/><path d="M8 12l3 3 5-6" stroke="var(--green-text)" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <span class="int-app-name">Google Meet</span>
+              <span class="int-status available">Available</span>
+            </div>
+            <div class="int-app">
+              <div class="int-app-ic" style="background:rgba(91,108,245,.12);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#9ba8ff" stroke-width="1.5"/><path d="M8 12h8M12 8v8" stroke="#9ba8ff" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <span class="int-app-name">Teams</span>
+              <span class="int-status planned">Planned</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calendar category -->
+        <div class="int-cat">
+          <div class="int-cat-lbl">Calendar</div>
+          <div class="int-apps">
+            <div class="int-app">
+              <div class="int-app-ic" style="background:rgba(245,158,60,.12);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="2" stroke="var(--orange-text)" stroke-width="1.5"/><path d="M3 9h18M8 2v4M16 2v4" stroke="var(--orange-text)" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <span class="int-app-name">Google Calendar</span>
+              <span class="int-status available">Available</span>
+            </div>
+            <div class="int-app">
+              <div class="int-app-ic" style="background:rgba(91,108,245,.12);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="2" stroke="#9ba8ff" stroke-width="1.5"/><path d="M3 9h18M8 2v4M16 2v4" stroke="#9ba8ff" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <span class="int-app-name">Outlook Calendar</span>
+              <span class="int-status planned">Planned</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tasks category -->
+        <div class="int-cat">
+          <div class="int-cat-lbl">Tasks</div>
+          <div class="int-apps">
+            <div class="int-app">
+              <div class="int-app-ic" style="background:rgba(94,106,210,.18);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" fill="rgba(94,106,210,.3)" stroke="none"/><path d="M8 12l3 3 5-6" stroke="#b0b8ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <span class="int-app-name">Linear</span>
+              <span class="int-status available">Available</span>
+            </div>
+            <div class="int-app">
+              <div class="int-app-ic" style="background:rgba(0,82,204,.15);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" fill="rgba(0,82,204,.3)" stroke="none"/><path d="M7 12.5l3.5 3.5L17 8" stroke="#7eb5ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <span class="int-app-name">Jira</span>
+              <span class="int-status available">Available</span>
+            </div>
+            <div class="int-app">
+              <div class="int-app-ic" style="background:rgba(74,222,128,.1);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1.5" fill="rgba(74,222,128,.3)" stroke="none"/><rect x="13" y="3" width="8" height="8" rx="1.5" fill="rgba(74,222,128,.2)" stroke="none"/><rect x="3" y="13" width="8" height="8" rx="1.5" fill="rgba(74,222,128,.15)" stroke="none"/><rect x="13" y="13" width="8" height="8" rx="1.5" fill="rgba(74,222,128,.1)" stroke="none"/></svg>
+              </div>
+              <span class="int-app-name">ClickUp</span>
+              <span class="int-status workflow">Workflow-ready</span>
+            </div>
+            <div class="int-app" style="opacity:.6;">
+              <div class="int-app-ic" style="background:rgba(95,168,255,.1);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="4" rx="1" fill="var(--blue-text)" opacity=".4"/><rect x="4" y="10" width="16" height="4" rx="1" fill="var(--blue-text)" opacity=".3"/><rect x="4" y="17" width="10" height="4" rx="1" fill="var(--blue-text)" opacity=".2"/></svg>
+              </div>
+              <span class="int-app-name">Trello</span>
+              <span class="int-status planned">Planned</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Knowledge category -->
+        <div class="int-cat">
+          <div class="int-cat-lbl">Knowledge</div>
+          <div class="int-apps">
+            <div class="int-app">
+              <div class="int-app-ic" style="background:rgba(247,201,72,.1);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke="var(--yellow-text)" stroke-width="1.5"/><path d="M8 8h8M8 12h8M8 16h5" stroke="var(--yellow-text)" stroke-width="1.5" stroke-linecap="round" opacity=".7"/></svg>
+              </div>
+              <span class="int-app-name">Notion</span>
+              <span class="int-status available">Available</span>
+            </div>
+            <div class="int-app" style="opacity:.6;">
+              <div class="int-app-ic" style="background:rgba(91,108,245,.1);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 5v8l-9 5-9-5V8l9-5z" stroke="#9ba8ff" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              </div>
+              <span class="int-app-name">Confluence</span>
+              <span class="int-status planned">Planned</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Communication category -->
+        <div class="int-cat">
+          <div class="int-cat-lbl">Communication</div>
+          <div class="int-apps">
+            <div class="int-app">
+              <div class="int-app-ic" style="background:rgba(74,222,128,.1);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6l7 5 7-5" stroke="var(--green-text)" stroke-width="1.5" stroke-linecap="round"/><rect x="2" y="4" width="20" height="16" rx="2" stroke="var(--green-text)" stroke-width="1.5"/></svg>
+              </div>
+              <span class="int-app-name">Slack</span>
+              <span class="int-status available">Available</span>
+            </div>
+            <div class="int-app" style="opacity:.6;">
+              <div class="int-app-ic" style="background:rgba(247,201,72,.1);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 5H3a1 1 0 00-1 1v12a1 1 0 001 1h18a1 1 0 001-1V6a1 1 0 00-1-1z" stroke="var(--yellow-text)" stroke-width="1.5"/><path d="M3 6l9 7 9-7" stroke="var(--yellow-text)" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <span class="int-app-name">Email digest</span>
+              <span class="int-status planned">Planned</span>
+            </div>
+            <div class="int-app" style="opacity:.5;">
+              <div class="int-app-ic" style="background:rgba(245,158,60,.1);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="var(--orange-text)" stroke-width="1.5"/><path d="M8 12h8M12 8l4 4-4 4" stroke="var(--orange-text)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <span class="int-app-name">Zapier</span>
+              <span class="int-status workflow">Workflow-ready</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status legend -->
+      <div class="int-legend">
+        <span class="int-legend-item"><span class="int-status available" style="position:static; transform:none;">Available</span> — Live integration</span>
+        <span class="int-legend-sep">·</span>
+        <span class="int-legend-item"><span class="int-status planned" style="position:static; transform:none;">Planned</span> — In roadmap</span>
+        <span class="int-legend-sep">·</span>
+        <span class="int-legend-item"><span class="int-status workflow" style="position:static; transform:none;">Workflow-ready</span> — Via Zapier/API</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== ANALYTICS / VISIBILITY ========== -->
+  <section style="padding: 100px 0; background: linear-gradient(to bottom, var(--bg-0), var(--bg-1) 30%, var(--bg-1) 70%, var(--bg-0));">
+    <div class="container">
+      <div style="display:grid; grid-template-columns:1fr 1.4fr; gap:80px; align-items:center;">
+        <div>
+          <div class="section-tag" style="margin-bottom:16px;"><span class="tag-dot" style="background:var(--blue);"></span>Analytics</div>
+          <h2 class="mid-h2">See what happens after every meeting</h2>
+          <p class="feat-sub">Track open action items, captured decisions, meeting activity, and follow-through across your team — in one place.</p>
+          <div class="feat-points">
+            <div class="feat-point"><span class="fp-dot" style="background:var(--blue);"></span>Weekly activity across all meetings</div>
+            <div class="feat-point"><span class="fp-dot" style="background:var(--green);"></span>Completed vs. open follow-ups at a glance</div>
+            <div class="feat-point"><span class="fp-dot" style="background:var(--orange);"></span>Decision coverage over time</div>
+          </div>
+        </div>
+        <!-- Analytics dashboard -->
+        <div class="feat-card-wrap">
+          <div style="background:var(--bg-0); border:1px solid var(--border-soft); border-radius:10px; padding:16px;">
+            <!-- Stat cards row -->
+            <div class="an-stats">
+              <div class="an-stat">
+                <div class="an-stat-num">18</div>
+                <div class="an-stat-lbl">Meetings this week</div>
+                <div class="an-stat-delta up">+3 vs last week</div>
+              </div>
+              <div class="an-stat">
+                <div class="an-stat-num">42</div>
+                <div class="an-stat-lbl">Action items created</div>
+                <div class="an-stat-delta up">+8 vs last week</div>
+              </div>
+              <div class="an-stat" style="border-right:0;">
+                <div class="an-stat-num">11</div>
+                <div class="an-stat-lbl">Open follow-ups</div>
+                <div class="an-stat-delta down">–4 resolved</div>
+              </div>
+            </div>
+            <div class="an-stats" style="border-top:1px solid var(--border-soft);">
+              <div class="an-stat">
+                <div class="an-stat-num">27</div>
+                <div class="an-stat-lbl">Decisions captured</div>
+                <div class="an-stat-delta up">+5 this week</div>
+              </div>
+              <div class="an-stat">
+                <div class="an-stat-num">31</div>
+                <div class="an-stat-lbl">Completed follow-ups</div>
+                <div class="an-stat-delta up">74% completion</div>
+              </div>
+              <div class="an-stat" style="border-right:0;">
+                <div class="an-stat-num">14</div>
+                <div class="an-stat-lbl">Summaries generated</div>
+                <div class="an-stat-delta up">100% auto</div>
+              </div>
+            </div>
+            <!-- Bar chart -->
+            <div style="padding:14px 0 8px; border-top:1px solid var(--border-soft); margin-top:0;">
+              <div style="font-size:10.5px; font-weight:600; color:var(--text-2); margin-bottom:14px; text-transform:uppercase; letter-spacing:.08em;">Meeting outcomes · last 7 days</div>
+              <div class="an-chart">
+                <div class="an-bar-group">
+                  <div class="an-bars">
+                    <div class="an-bar" style="height:52px; background:var(--indigo); opacity:.7;"></div>
+                    <div class="an-bar" style="height:28px; background:var(--green); opacity:.7;"></div>
+                    <div class="an-bar" style="height:18px; background:var(--orange); opacity:.7;"></div>
+                  </div>
+                  <div class="an-day">Mon</div>
+                </div>
+                <div class="an-bar-group">
+                  <div class="an-bars">
+                    <div class="an-bar" style="height:36px; background:var(--indigo); opacity:.7;"></div>
+                    <div class="an-bar" style="height:20px; background:var(--green); opacity:.7;"></div>
+                    <div class="an-bar" style="height:12px; background:var(--orange); opacity:.7;"></div>
+                  </div>
+                  <div class="an-day">Tue</div>
+                </div>
+                <div class="an-bar-group">
+                  <div class="an-bars">
+                    <div class="an-bar" style="height:64px; background:var(--indigo); opacity:.9;"></div>
+                    <div class="an-bar" style="height:40px; background:var(--green); opacity:.9;"></div>
+                    <div class="an-bar" style="height:24px; background:var(--orange); opacity:.9;"></div>
+                  </div>
+                  <div class="an-day">Wed</div>
+                </div>
+                <div class="an-bar-group">
+                  <div class="an-bars">
+                    <div class="an-bar" style="height:44px; background:var(--indigo); opacity:.7;"></div>
+                    <div class="an-bar" style="height:32px; background:var(--green); opacity:.7;"></div>
+                    <div class="an-bar" style="height:16px; background:var(--orange); opacity:.7;"></div>
+                  </div>
+                  <div class="an-day">Thu</div>
+                </div>
+                <div class="an-bar-group">
+                  <div class="an-bars">
+                    <div class="an-bar" style="height:76px; background:var(--indigo);"></div>
+                    <div class="an-bar" style="height:48px; background:var(--green);"></div>
+                    <div class="an-bar" style="height:28px; background:var(--orange);"></div>
+                  </div>
+                  <div class="an-day">Fri</div>
+                </div>
+                <div class="an-bar-group" style="opacity:.4;">
+                  <div class="an-bars">
+                    <div class="an-bar" style="height:16px; background:var(--indigo);"></div>
+                    <div class="an-bar" style="height:8px; background:var(--green);"></div>
+                    <div class="an-bar" style="height:4px; background:var(--orange);"></div>
+                  </div>
+                  <div class="an-day">Sat</div>
+                </div>
+                <div class="an-bar-group" style="opacity:.2;">
+                  <div class="an-bars">
+                    <div class="an-bar" style="height:8px; background:var(--indigo);"></div>
+                  </div>
+                  <div class="an-day">Sun</div>
+                </div>
+              </div>
+              <div style="display:flex; gap:16px; margin-top:10px;">
+                <span style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:var(--text-2);"><span style="width:8px;height:8px;border-radius:2px;background:var(--indigo);display:inline-block;"></span>Action items</span>
+                <span style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:var(--text-2);"><span style="width:8px;height:8px;border-radius:2px;background:var(--green);display:inline-block;"></span>Completed</span>
+                <span style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:var(--text-2);"><span style="width:8px;height:8px;border-radius:2px;background:var(--orange);display:inline-block;"></span>Decisions</span>
+              </div>
+            </div>
+            <!-- Activity list -->
+            <div style="border-top:1px solid var(--border-soft); padding-top:12px; margin-top:4px;">
+              <div style="font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-3); font-weight:500; margin-bottom:8px;">Recent activity</div>
+              <div class="an-act-row"><span class="an-act-ic" style="background:var(--indigo-bg); color:var(--indigo);">S</span><span class="an-act-txt">Summary created · <span style="color:var(--text-2);">Weekly Product Sync</span></span><span class="an-act-time">2m ago</span></div>
+              <div class="an-act-row"><span class="an-act-ic" style="background:var(--blue-bg); color:var(--blue-text);">✓</span><span class="an-act-txt">Task assigned to <span style="color:var(--text-2);">Anna K.</span></span><span class="an-act-time">4m ago</span></div>
+              <div class="an-act-row"><span class="an-act-ic" style="background:var(--orange-bg); color:var(--orange-text);">D</span><span class="an-act-txt">Decision captured · <span style="color:var(--text-2);">Pricing approved</span></span><span class="an-act-time">18m ago</span></div>
+              <div class="an-act-row" style="opacity:.6;"><span class="an-act-ic" style="background:var(--green-bg); color:var(--green-text);">↑</span><span class="an-act-txt">Follow-up completed · <span style="color:var(--text-2);">Confirm SLA</span></span><span class="an-act-time">1h ago</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== USE CASES ========== -->
+  <section style="padding: 100px 0;">
+    <div class="container">
+      <div style="max-width:620px; margin:0 auto 52px; text-align:center;">
+        <div class="section-tag" style="justify-content:center; margin-bottom:16px;"><span class="tag-dot" style="background:var(--green);"></span>Use cases</div>
+        <h2 class="mid-h2">Built for teams that run on meetings</h2>
+        <p class="mid-sub">From product syncs to client calls, Meetory keeps every discussion structured, searchable, and actionable.</p>
+      </div>
+
+      <div class="uc-grid">
+        <div class="uc-card">
+          <div class="uc-icon" style="background:var(--indigo-bg); color:var(--indigo);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="1.5" y="1.5" width="6" height="6" rx="1"/><rect x="8.5" y="1.5" width="6" height="6" rx="1"/><rect x="1.5" y="8.5" width="6" height="6" rx="1"/><path d="M8.5 11.5h6M11.5 8.5v6"/></svg>
+          </div>
+          <div class="uc-title">Product teams</div>
+          <p class="uc-desc">Keep roadmap discussions, backlog decisions, sprint planning, and follow-ups aligned — without the meeting-to-meeting memory loss.</p>
+          <div class="uc-benefits">
+            <div class="uc-benefit"><span class="uc-dot" style="background:var(--indigo);"></span>Product decisions saved and searchable</div>
+            <div class="uc-benefit"><span class="uc-dot" style="background:var(--indigo);"></span>Backlog tasks created from sprint syncs</div>
+            <div class="uc-benefit"><span class="uc-dot" style="background:var(--indigo);"></span>Sprint context preserved across quarters</div>
+          </div>
+          <div class="uc-foot">
+            <span class="chip chip-indigo" style="font-size:9.5px;"><span class="d"></span>Product Sync</span>
+            <span class="chip chip-blue" style="font-size:9.5px;"><span class="d"></span>Sprint Planning</span>
+          </div>
+        </div>
+
+        <div class="uc-card">
+          <div class="uc-icon" style="background:var(--yellow-bg); color:var(--yellow-text);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="5" r="2.5"/><path d="M2 14c0-3 2.5-5 6-5s6 2 6 5"/><path d="M11.5 3.5l1 1-1 1M12.5 4.5h1.5"/></svg>
+          </div>
+          <div class="uc-title">Founders &amp; leadership</div>
+          <p class="uc-desc">Turn strategic conversations into clear priorities and accountable next steps. No more "I thought we decided…" moments.</p>
+          <div class="uc-benefits">
+            <div class="uc-benefit"><span class="uc-dot" style="background:var(--yellow);"></span>Decisions visible across the organization</div>
+            <div class="uc-benefit"><span class="uc-dot" style="background:var(--yellow);"></span>Ownership clear for every outcome</div>
+            <div class="uc-benefit"><span class="uc-dot" style="background:var(--yellow);"></span>No lost context from leadership calls</div>
+          </div>
+          <div class="uc-foot">
+            <span class="chip chip-yellow" style="font-size:9.5px;"><span class="d"></span>Leadership Review</span>
+            <span class="chip chip-yellow" style="font-size:9.5px;"><span class="d"></span>Strategy</span>
+          </div>
+        </div>
+
+        <div class="uc-card">
+          <div class="uc-icon" style="background:var(--blue-bg); color:var(--blue-text);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="1.5" y="3" width="13" height="10" rx="1.5"/><path d="M5 3V2M11 3V2M1.5 6.5h13"/></svg>
+          </div>
+          <div class="uc-title">Agencies &amp; client teams</div>
+          <p class="uc-desc">Convert client calls into summaries, tasks, and follow-up lists your team can execute — and share recaps clients actually read.</p>
+          <div class="uc-benefits">
+            <div class="uc-benefit"><span class="uc-dot" style="background:var(--blue);"></span>Client notes organized per project</div>
+            <div class="uc-benefit"><span class="uc-dot" style="background:var(--blue);"></span>Deliverables tracked with source context</div>
+            <div class="uc-benefit"><span class="uc-dot" style="background:var(--blue);"></span>Recaps shareable with one link</div>
+          </div>
+          <div class="uc-foot">
+            <span class="chip chip-blue" style="font-size:9.5px;"><span class="d"></span>Client Call</span>
+            <span class="chip chip-blue" style="font-size:9.5px;"><span class="d"></span>Onboarding</span>
+          </div>
+        </div>
+
+        <div class="uc-card">
+          <div class="uc-icon" style="background:var(--green-bg); color:var(--green-text);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 4l2 2 4-4M3 8l2 2 4-4M3 12l2 2 4-4"/></svg>
+          </div>
+          <div class="uc-title">Operations teams</div>
+          <p class="uc-desc">Keep recurring meetings, cross-functional updates, and process discussions organized so nothing repeats and nothing disappears.</p>
+          <div class="uc-benefits">
+            <div class="uc-benefit"><span class="uc-dot" style="background:var(--green);"></span>Recurring follow-ups tracked automatically</div>
+            <div class="uc-benefit"><span class="uc-dot" style="background:var(--green);"></span>Team alignment visible across functions</div>
+            <div class="uc-benefit"><span class="uc-dot" style="background:var(--green);"></span>Searchable process history</div>
+          </div>
+          <div class="uc-foot">
+            <span class="chip chip-green" style="font-size:9.5px;"><span class="d"></span>Weekly Standup</span>
+            <span class="chip chip-green" style="font-size:9.5px;"><span class="d"></span>All-Hands</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    /* How it works */
+    .hiw-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; position: relative; }
+    .hiw-line { position: absolute; top: 28px; left: calc(12.5% + 16px); right: calc(12.5% + 16px); height: 1px; background: linear-gradient(to right, transparent, var(--border-strong) 10%, var(--border-strong) 90%, transparent); z-index: 0; pointer-events: none; }
+    .hiw-step { padding: 0 10px; position: relative; z-index: 1; }
+    .hiw-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .hiw-num::before { content: ""; width: 24px; height: 24px; border-radius: 50%; background: var(--bg-2); border: 1px solid var(--border); display: inline-flex; }
+    .hiw-card { background: var(--bg-1); border: 1px solid var(--border-soft); border-radius: 12px; padding: 18px; }
+    .hiw-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .hiw-ic { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; flex-shrink: 0; }
+    .hiw-label { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: var(--text-0); }
+    .hiw-desc { font-size: 12.5px; color: var(--text-2); line-height: 1.55; margin: 0 0 12px; }
+    .hiw-mini { background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .hiw-mini-row { display: flex; align-items: center; gap: 8px; background: var(--bg-3); border: 1px solid var(--border-soft); border-radius: 6px; padding: 6px 8px; font-size: 11.5px; }
+    .hiw-mini-ic { width: 20px; height: 20px; border-radius: 5px; display: grid; place-items: center; font-size: 9.5px; font-weight: 600; flex-shrink: 0; }
+    .hiw-mini-txt { flex: 1; color: var(--text-1); font-size: 11.5px; }
+    .ts-mini-row { display: flex; align-items: center; gap: 7px; padding: 4px 0; }
+    .hiw-output-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--border-soft); }
+    .hiw-output-row:first-of-type { border-top: 0; padding-top: 0; }
+    .hiw-out-ic { width: 20px; height: 20px; border-radius: 5px; display: grid; place-items: center; font-size: 9.5px; font-weight: 600; flex-shrink: 0; }
+    .hiw-out-lbl { flex: 1; font-size: 11.5px; color: var(--text-1); }
+    .hiw-ft-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-top: 1px solid var(--border-soft); }
+    .hiw-ft-row:first-of-type { border-top: 0; }
+    .hiw-ft-check { width: 13px; height: 13px; border-radius: 3px; border: 1px solid var(--border-strong); flex-shrink: 0; }
+    .hiw-ft-check.done { background: var(--green); border-color: var(--green); }
+    .hiw-ft-check.in-progress { background: var(--indigo); border-color: var(--indigo); }
+
+    /* Integrations */
+    .int-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 20px; }
+    .int-cat { background: var(--bg-1); border: 1px solid var(--border-soft); border-radius: 12px; padding: 16px; }
+    .int-cat-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); font-weight: 500; margin-bottom: 14px; }
+    .int-apps { display: flex; flex-direction: column; gap: 8px; }
+    .int-app { display: flex; align-items: center; gap: 9px; }
+    .int-app-ic { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; flex-shrink: 0; }
+    .int-app-name { flex: 1; font-size: 12.5px; color: var(--text-1); }
+    .int-status { font-size: 9.5px; font-weight: 500; padding: 2px 7px; border-radius: 100px; white-space: nowrap; }
+    .int-status.available { background: var(--green-bg); color: var(--green-text); }
+    .int-status.planned { background: var(--bg-3); color: var(--text-3); border: 1px solid var(--border); }
+    .int-status.workflow { background: var(--blue-bg); color: var(--blue-text); }
+    .int-legend { display: flex; align-items: center; gap: 14px; justify-content: center; font-size: 12px; color: var(--text-3); flex-wrap: wrap; }
+    .int-legend-sep { color: var(--text-4); }
+    .int-legend-item { display: flex; align-items: center; gap: 6px; }
+
+    /* Analytics */
+    .an-stats { display: grid; grid-template-columns: repeat(3,1fr); }
+    .an-stat { padding: 14px 16px; border-right: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
+    .an-stat-num { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: var(--text-0); margin-bottom: 2px; }
+    .an-stat-lbl { font-size: 11px; color: var(--text-2); margin-bottom: 3px; }
+    .an-stat-delta { font-size: 10.5px; font-family: 'JetBrains Mono', monospace; }
+    .an-stat-delta.up { color: var(--green-text); }
+    .an-stat-delta.down { color: var(--blue-text); }
+    .an-chart { display: flex; gap: 8px; align-items: flex-end; height: 80px; }
+    .an-bar-group { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+    .an-bars { display: flex; gap: 2px; align-items: flex-end; height: 76px; }
+    .an-bar { border-radius: 3px 3px 0 0; flex: 1; min-width: 4px; transition: opacity .2s; }
+    .an-day { font-size: 9.5px; color: var(--text-3); font-family: 'JetBrains Mono',monospace; }
+    .an-act-row { display: flex; align-items: center; gap: 9px; padding: 7px 0; border-top: 1px solid var(--border-soft); }
+    .an-act-row:first-of-type { border-top: 0; }
+    .an-act-ic { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-size: 10px; font-weight: 600; flex-shrink: 0; }
+    .an-act-txt { flex: 1; font-size: 12px; color: var(--text-0); }
+    .an-act-time { font-size: 10.5px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; }
+
+    /* Use cases */
+    .uc-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+    .uc-card { background: var(--bg-1); border: 1px solid var(--border-soft); border-radius: 14px; padding: 22px 20px; display: flex; flex-direction: column; gap: 10px; }
+    .uc-icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; }
+    .uc-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: var(--text-0); }
+    .uc-desc { font-size: 13px; color: var(--text-2); line-height: 1.55; margin: 0; flex: 1; }
+    .uc-benefits { display: flex; flex-direction: column; gap: 7px; }
+    .uc-benefit { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: var(--text-1); line-height: 1.4; }
+    .uc-dot { width: 5px; height: 5px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+    .uc-foot { display: flex; gap: 5px; flex-wrap: wrap; padding-top: 10px; border-top: 1px solid var(--border-soft); }
+
+    /* Responsive supporting sections */
+    @media (max-width: 1100px) {
+      .hiw-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
+      .hiw-line { display: none; }
+      .int-grid { grid-template-columns: repeat(3,1fr); }
+      .uc-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 700px) {
+      .hiw-grid { grid-template-columns: 1fr; }
+      .int-grid { grid-template-columns: 1fr 1fr; }
+      .uc-grid { grid-template-columns: 1fr; }
+      .an-stats { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 500px) {
+      .int-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+
+    </div>
+  </section>
+
+  <!-- ========== PRICING ========== -->
+  <section id="pricing" style="padding: 100px 0; background: linear-gradient(to bottom, var(--bg-0), var(--bg-1) 30%, var(--bg-1) 70%, var(--bg-0));">
+    <div class="container">
+      <div style="max-width:560px; margin:0 auto 52px; text-align:center;">
+        <div class="section-tag" style="justify-content:center; margin-bottom:16px;"><span class="tag-dot" style="background:var(--indigo);"></span>Access</div>
+        <h2 class="mid-h2">Simple access. No surprise charges.</h2>
+        <p class="mid-sub">Get started today — no credit card needed. Scale when you're ready.</p>
+      </div>
+      <div class="pricing-grid">
+        <!-- Individuals -->
+        <div class="pr-card">
+          <div class="pr-tier">Individuals</div>
+          <div class="pr-price">Free <span class="pr-unit">forever</span></div>
+          <div class="pr-desc">For solo users who want structured meeting outputs without the chaos.</div>
+          <a class="btn btn-outline pr-btn" href="#">Open app →</a>
+          <div class="pr-divider"></div>
+          <ul class="pr-list">
+            <li>Unlimited meetings</li>
+            <li>AI summaries &amp; transcripts</li>
+            <li>Action item extraction</li>
+            <li>Full-text search</li>
+            <li>30-day history</li>
+          </ul>
+        </div>
+        <!-- Teams (popular) -->
+        <div class="pr-card pr-pop">
+          <div class="pr-pop-badge">Most popular</div>
+          <div class="pr-tier">Teams</div>
+          <div class="pr-price">Early access <span class="pr-unit">free while in beta</span></div>
+          <div class="pr-desc">For teams running recurring syncs, planning, and client calls together.</div>
+          <a class="btn btn-primary pr-btn" href="#">Open app →</a>
+          <div class="pr-divider"></div>
+          <ul class="pr-list">
+            <li>Everything in Individuals</li>
+            <li>Shared workspace per team</li>
+            <li>Decisions &amp; task ownership</li>
+            <li>Bidirectional Linear / Jira sync</li>
+            <li>Slack notifications</li>
+            <li>Unlimited history &amp; search</li>
+            <li>Custom labels &amp; routing</li>
+          </ul>
+        </div>
+        <!-- Companies -->
+        <div class="pr-card">
+          <div class="pr-tier">Companies</div>
+          <div class="pr-price">Custom <span class="pr-unit">talk to us</span></div>
+          <div class="pr-desc">For larger organizations needing control, compliance, and dedicated support.</div>
+          <a class="btn btn-outline pr-btn" href="#">Contact us →</a>
+          <div class="pr-divider"></div>
+          <ul class="pr-list">
+            <li>Everything in Teams</li>
+            <li>SSO &amp; SCIM provisioning</li>
+            <li>Audit logs &amp; data residency</li>
+            <li>HIPAA, custom DPAs</li>
+            <li>Dedicated CSM &amp; SLA</li>
+            <li>Priority support</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== AUTH SECTION ========== -->
+  <section id="auth" style="padding: 100px 0;">
+    <div class="container">
+      <div class="auth-layout">
+        <!-- Left: copy + product hint -->
+        <div class="auth-left">
+          <div class="section-tag" style="margin-bottom:20px;"><span class="tag-dot" style="background:var(--green);"></span>Get started free</div>
+          <h2 class="mid-h2" style="max-width:420px;">Your first meeting summary is one click away.</h2>
+          <p class="feat-sub" style="max-width:400px;">Connect your calendar, run a meeting, and Meetory delivers the summary, decisions, and action items before you close the tab.</p>
+
+          <!-- Small product preview card -->
+          <div class="auth-preview">
+            <div class="auth-preview-head">
+              <div style="width:7px; height:7px; border-radius:2px; background:var(--orange);"></div>
+              <span style="font-size:12.5px; font-weight:600; color:var(--text-0);">Product Sync · Today</span>
+              <span class="chip chip-green" style="margin-left:auto;"><span class="d"></span>Summary ready</span>
+            </div>
+            <div style="font-size:11.5px; color:var(--text-2); line-height:1.55; margin-bottom:10px;">Billing v2 timeline confirmed. Rate-limit middleware to be extracted before launch. Free plan capped at 10 seats.</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <span class="chip chip-green" style="font-size:9.5px;"><span class="d"></span>4 decisions</span>
+              <span class="chip chip-blue" style="font-size:9.5px;"><span class="d"></span>7 action items</span>
+              <span class="chip chip-indigo" style="font-size:9.5px;"><span class="d"></span>Routed to Linear</span>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:24px;">
+            <span style="display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text-2);"><span style="width:14px; height:14px; border-radius:50%; background:var(--green-bg); display:grid; place-items:center; color:var(--green-text); font-size:9px; font-weight:700;">✓</span>No credit card</span>
+            <span style="display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text-2);"><span style="width:14px; height:14px; border-radius:50%; background:var(--green-bg); display:grid; place-items:center; color:var(--green-text); font-size:9px; font-weight:700;">✓</span>Free forever plan</span>
+            <span style="display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text-2);"><span style="width:14px; height:14px; border-radius:50%; background:var(--green-bg); display:grid; place-items:center; color:var(--green-text); font-size:9px; font-weight:700;">✓</span>Setup in 90 seconds</span>
+          </div>
+        </div>
+
+        <!-- Right: auth card -->
+        <div class="auth-card">
+          <!-- Tabs -->
+          <div class="auth-tabs">
+            <button class="auth-tab active" id="tab-signin" onclick="switchTab('signin')">Sign in</button>
+            <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create account</button>
+          </div>
+
+          <!-- Sign in form -->
+          <div class="auth-form" id="form-signin">
+            <button class="auth-google">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.68 8.18c0-.57-.05-1.11-.14-1.64H8v3.1h4.3c-.19 1-.74 1.84-1.57 2.41v2h2.54c1.49-1.37 2.35-3.39 2.35-5.87z" fill="#4285F4"/><path d="M8 16c2.16 0 3.97-.72 5.29-1.95l-2.54-2a4.8 4.8 0 01-7.18-2.52H.96v2.07A8 8 0 008 16z" fill="#34A853"/><path d="M3.57 9.53A4.8 4.8 0 013.33 8c0-.53.09-1.04.24-1.53V4.4H.96A8 8 0 000 8c0 1.29.31 2.51.96 3.6l2.61-2.07z" fill="#FBBC05"/><path d="M8 3.18c1.21 0 2.3.42 3.16 1.24l2.36-2.36A8 8 0 00.96 4.4l2.61 2.07C4.25 4.85 5.95 3.18 8 3.18z" fill="#EA4335"/></svg>
+              Continue with Google
+            </button>
+            <div class="auth-divider"><span>or</span></div>
+            <div class="auth-field">
+              <label class="auth-label">Email</label>
+              <input class="auth-input" type="email" placeholder="you@company.com" />
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" style="display:flex; justify-content:space-between;"><span>Password</span><a href="#" style="color:var(--indigo); font-size:11px; text-decoration:none;">Forgot password?</a></label>
+              <input class="auth-input" type="password" placeholder="••••••••" />
+            </div>
+            <button class="btn btn-primary" style="width:100%; justify-content:center; padding:10px; font-size:14px; margin-top:4px;">Sign in →</button>
+            <div style="text-align:center; font-size:12px; color:var(--text-3); margin-top:14px;">By continuing you agree to the <a href="#" style="color:var(--text-2); text-decoration:none;">Terms</a> and <a href="#" style="color:var(--text-2); text-decoration:none;">Privacy policy</a>.</div>
+          </div>
+
+          <!-- Create account form -->
+          <div class="auth-form" id="form-signup" style="display:none;">
+            <button class="auth-google">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.68 8.18c0-.57-.05-1.11-.14-1.64H8v3.1h4.3c-.19 1-.74 1.84-1.57 2.41v2h2.54c1.49-1.37 2.35-3.39 2.35-5.87z" fill="#4285F4"/><path d="M8 16c2.16 0 3.97-.72 5.29-1.95l-2.54-2a4.8 4.8 0 01-7.18-2.52H.96v2.07A8 8 0 008 16z" fill="#34A853"/><path d="M3.57 9.53A4.8 4.8 0 013.33 8c0-.53.09-1.04.24-1.53V4.4H.96A8 8 0 000 8c0 1.29.31 2.51.96 3.6l2.61-2.07z" fill="#FBBC05"/><path d="M8 3.18c1.21 0 2.3.42 3.16 1.24l2.36-2.36A8 8 0 00.96 4.4l2.61 2.07C4.25 4.85 5.95 3.18 8 3.18z" fill="#EA4335"/></svg>
+              Sign up with Google
+            </button>
+            <div class="auth-divider"><span>or</span></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="auth-field">
+                <label class="auth-label">First name</label>
+                <input class="auth-input" type="text" placeholder="Anna" />
+              </div>
+              <div class="auth-field">
+                <label class="auth-label">Last name</label>
+                <input class="auth-input" type="text" placeholder="K." />
+              </div>
+            </div>
+            <div class="auth-field">
+              <label class="auth-label">Work email</label>
+              <input class="auth-input" type="email" placeholder="you@company.com" />
+            </div>
+            <div class="auth-field">
+              <label class="auth-label">Password</label>
+              <input class="auth-input" type="password" placeholder="At least 8 characters" />
+            </div>
+            <button class="btn btn-primary" style="width:100%; justify-content:center; padding:10px; font-size:14px; margin-top:4px;">Create account →</button>
+            <div style="text-align:center; font-size:12px; color:var(--text-3); margin-top:14px;">By continuing you agree to the <a href="#" style="color:var(--text-2); text-decoration:none;">Terms</a> and <a href="#" style="color:var(--text-2); text-decoration:none;">Privacy policy</a>.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FAQ ========== -->
+  <section id="faq" style="padding: 80px 0 100px;">
+    <div class="container">
+      <div style="max-width:520px; margin:0 auto 44px; text-align:center;">
+        <div class="section-tag" style="justify-content:center; margin-bottom:16px;"><span class="tag-dot"></span>FAQ</div>
+        <h2 class="mid-h2">Common questions.</h2>
+      </div>
+      <div class="faq-grid">
+        <div class="faq-item2" id="faq1">
+          <button class="faq-q2" onclick="toggleFaq('faq1')">
+            <span>What exactly is Meetory?</span>
+            <span class="faq-ic2">+</span>
+          </button>
+          <div class="faq-a2">
+            <div class="faq-a2-inner">Meetory is an AI meeting workspace. It joins your calls, transcribes them, and automatically extracts summaries, decisions, and action items — then routes tasks to Linear, Jira, or Notion. Think of it as the layer between your calendar and your task tracker.</div>
+          </div>
+        </div>
+        <div class="faq-item2" id="faq2">
+          <button class="faq-q2" onclick="toggleFaq('faq2')">
+            <span>How are action items created?</span>
+            <span class="faq-ic2">+</span>
+          </button>
+          <div class="faq-a2">
+            <div class="faq-a2-inner">Meetory listens for commitments, assignments, and follow-ups during the conversation. Each extracted item is scored by confidence. Items above your threshold are auto-created; others land in an "AI findings to confirm" queue where you review before they become tasks.</div>
+          </div>
+        </div>
+        <div class="faq-item2" id="faq3">
+          <button class="faq-q2" onclick="toggleFaq('faq3')">
+            <span>Can I search across all my past meetings?</span>
+            <span class="faq-ic2">+</span>
+          </button>
+          <div class="faq-a2">
+            <div class="faq-a2-inner">Yes. Full-text search runs across every transcript, summary, decision, and action item. Results are grouped by meeting and you can jump to the exact recording timestamp for any result.</div>
+          </div>
+        </div>
+        <div class="faq-item2" id="faq4">
+          <button class="faq-q2" onclick="toggleFaq('faq4')">
+            <span>Does it work for the whole team or just me?</span>
+            <span class="faq-ic2">+</span>
+          </button>
+          <div class="faq-a2">
+            <div class="faq-a2-inner">Both. The free plan covers solo use with full functionality. Team workspaces share meeting summaries, decisions, and tasks across members — with role-based access and cross-meeting search.</div>
+          </div>
+        </div>
+        <div class="faq-item2" id="faq5">
+          <button class="faq-q2" onclick="toggleFaq('faq5')">
+            <span>Which integrations are available now?</span>
+            <span class="faq-ic2">+</span>
+          </button>
+          <div class="faq-a2">
+            <div class="faq-a2-inner">Live today: Zoom, Google Meet, Google Calendar, Linear, Jira, Notion, Slack. In the roadmap: Microsoft Teams, Outlook, Confluence. Via Zapier/API: ClickUp, Trello, HubSpot, and most task tools.</div>
+          </div>
+        </div>
+        <div class="faq-item2" id="faq6">
+          <button class="faq-q2" onclick="toggleFaq('faq6')">
+            <span>Is my meeting data private?</span>
+            <span class="faq-ic2">+</span>
+          </button>
+          <div class="faq-a2">
+            <div class="faq-a2-inner">Yes. Your content is never used to train models. You control retention duration, who can view each meeting, and per-meeting redaction. SOC 2 Type II, GDPR, and HIPAA-ready configurations available on the Company plan.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FINAL CTA ========== -->
+  <section style="padding: 80px 0 120px;">
+    <div class="container">
+      <div class="final-cta">
+        <div class="final-cta-glow"></div>
+        <div style="position:relative;">
+          <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px;">
+            <span class="logo-mark" style="width:28px; height:28px; border-radius:8px;"></span>
+            <span style="font-weight:600; font-size:15px; color:var(--text-0);">Meetory</span>
+          </div>
+          <h2 class="mid-h2" style="text-align:center; max-width:700px; margin:0 auto 14px;">Stop writing recaps.<br/>Start shipping.</h2>
+          <p style="text-align:center; font-size:16px; color:var(--text-2); max-width:460px; margin:0 auto 32px; line-height:1.6;">Set up in 90 seconds. Free forever for individuals. No card required.</p>
+          <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+            <a class="btn btn-primary" style="padding:11px 22px; font-size:14.5px;" href="#">Open app →</a>
+            <a class="btn btn-outline" style="padding:11px 18px; font-size:14.5px;" href="#">See how it works</a>
+          </div>
+          <div style="display:flex; gap:20px; justify-content:center; margin-top:20px; flex-wrap:wrap;">
+            <span style="font-size:12px; color:var(--text-3); display:flex; align-items:center; gap:5px;"><span style="width:5px; height:5px; border-radius:50%; background:var(--green);"></span>All systems operational</span>
+            <span style="font-size:12px; color:var(--text-3);">SOC 2 Type II</span>
+            <span style="font-size:12px; color:var(--text-3);">GDPR</span>
+            <span style="font-size:12px; color:var(--text-3);">Free plan — no expiry</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer style="border-top:1px solid var(--border-soft); padding:48px 0 32px;">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="logo" href="#" style="display:inline-flex; margin-bottom:12px;"><span class="logo-mark"></span>Meetory</a>
+          <p style="font-size:13px; color:var(--text-2); line-height:1.6; max-width:260px; margin:0 0 16px;">Meetings that turn into summaries, tasks, and next steps. Automatically.</p>
+          <div style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--green-text);"><span style="width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px rgba(74,222,128,.2);"></span>All systems operational</div>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-head">Product</div>
+          <a class="footer-link" href="#">Features</a>
+          <a class="footer-link" href="#">Integrations</a>
+          <a class="footer-link" href="#">Pricing</a>
+          <a class="footer-link" href="#">Changelog</a>
+          <a class="footer-link" href="#">Roadmap</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-head">Company</div>
+          <a class="footer-link" href="#">About</a>
+          <a class="footer-link" href="#">Customers</a>
+          <a class="footer-link" href="#">Careers</a>
+          <a class="footer-link" href="#">Security</a>
+          <a class="footer-link" href="#">Contact</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-head">App</div>
+          <a class="footer-link" href="#">Open app</a>
+          <a class="footer-link" href="#">Documentation</a>
+          <a class="footer-link" href="#">API reference</a>
+          <a class="footer-link" href="#">Status page</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-head">Legal</div>
+          <a class="footer-link" href="#">Privacy</a>
+          <a class="footer-link" href="#">Terms</a>
+          <a class="footer-link" href="#">DPA</a>
+          <a class="footer-link" href="#">Subprocessors</a>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border-soft); margin-top:40px; padding-top:22px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div style="font-size:12px; color:var(--text-3);">© 2026 Meetory, Inc. · Made for teams that run on meetings.</div>
+        <div style="font-size:11px; color:var(--text-4); font-family:'JetBrains Mono',monospace;">v1.0-beta</div>
+      </div>
+    </div>
+  </footer>
+
+  <style>
+    /* Accent — desaturated slate-indigo */
+    :root { --indigo: #4452cc; --indigo-2: #4f5dd4; --indigo-bg: rgba(68,82,204,0.10); --indigo-border: rgba(68,82,204,0.22); }
+
+    /* Pricing */
+    .pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .pr-card { background:var(--bg-1); border:1px solid var(--border-soft); border-radius:14px; padding:26px; display:flex; flex-direction:column; gap:0; }
+    .pr-card.pr-pop { background:var(--bg-2); border-color:var(--indigo-border); box-shadow:0 0 0 1px var(--indigo-border) inset; position:relative; }
+    .pr-pop-badge { position:absolute; top:-11px; left:50%; transform:translateX(-50%); background:var(--indigo); color:#fff; font-size:10.5px; font-weight:600; padding:3px 11px; border-radius:100px; white-space:nowrap; letter-spacing:.02em; }
+    .pr-tier { font-size:12px; color:var(--text-2); text-transform:uppercase; letter-spacing:.1em; font-weight:500; margin-bottom:10px; }
+    .pr-price { font-size:26px; font-weight:600; letter-spacing:-.02em; color:var(--text-0); margin-bottom:6px; }
+    .pr-unit { font-size:13px; font-weight:400; color:var(--text-3); letter-spacing:0; }
+    .pr-desc { font-size:13px; color:var(--text-2); line-height:1.55; margin-bottom:18px; }
+    .pr-btn { width:100%; justify-content:center; margin-bottom:18px; }
+    .pr-divider { height:1px; background:var(--border-soft); margin-bottom:18px; }
+    .pr-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
+    .pr-list li { font-size:13px; color:var(--text-1); display:flex; align-items:flex-start; gap:9px; line-height:1.4; }
+    .pr-list li::before { content:""; width:13px; height:13px; border-radius:3px; background:var(--green-text); flex-shrink:0; margin-top:2px; -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 13'><path d='M2.5 6.5l3 3 5-6' stroke='black' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") no-repeat center / 11px; mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 13'><path d='M2.5 6.5l3 3 5-6' stroke='black' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") no-repeat center / 11px; }
+
+    /* Auth */
+    .auth-layout { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start; }
+    .auth-preview { background:var(--bg-2); border:1px solid var(--border); border-radius:12px; padding:16px; margin-top:28px; }
+    .auth-preview-head { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+    .auth-card { background:var(--bg-1); border:1px solid var(--border); border-radius:14px; padding:28px; box-shadow:0 20px 60px -20px rgba(0,0,0,0.5); }
+    .auth-tabs { display:flex; gap:0; border-bottom:1px solid var(--border-soft); margin-bottom:22px; }
+    .auth-tab { flex:1; padding:10px; background:transparent; border:none; border-bottom:2px solid transparent; color:var(--text-2); font-family:inherit; font-size:13.5px; font-weight:500; cursor:pointer; margin-bottom:-1px; transition:all .15s; }
+    .auth-tab.active { color:var(--text-0); border-bottom-color:var(--indigo); }
+    .auth-google { width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:10px; background:var(--bg-2); border:1px solid var(--border); border-radius:8px; color:var(--text-0); font-family:inherit; font-size:13.5px; font-weight:500; cursor:pointer; transition:background .15s; margin-bottom:16px; }
+    .auth-google:hover { background:var(--bg-3); }
+    .auth-divider { display:flex; align-items:center; gap:12px; margin-bottom:16px; color:var(--text-3); font-size:12px; }
+    .auth-divider::before, .auth-divider::after { content:""; flex:1; height:1px; background:var(--border-soft); }
+    .auth-field { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; }
+    .auth-label { font-size:12px; font-weight:500; color:var(--text-1); }
+    .auth-input { background:var(--bg-2); border:1px solid var(--border); border-radius:7px; padding:9px 12px; color:var(--text-0); font-family:inherit; font-size:13.5px; outline:none; transition:border-color .15s; }
+    .auth-input:focus { border-color:var(--indigo); box-shadow:0 0 0 3px rgba(76,111,255,.12); }
+    .auth-input::placeholder { color:var(--text-3); }
+    .auth-form { display:flex; flex-direction:column; }
+
+    /* FAQ */
+    .faq-grid { max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:6px; }
+    .faq-item2 { background:var(--bg-1); border:1px solid var(--border-soft); border-radius:10px; overflow:hidden; }
+    .faq-q2 { width:100%; display:flex; align-items:center; justify-content:space-between; padding:15px 18px; background:transparent; border:none; color:var(--text-0); font-family:inherit; font-size:14px; font-weight:500; cursor:pointer; text-align:left; gap:12px; }
+    .faq-q2:hover { background:var(--bg-2); }
+    .faq-ic2 { color:var(--text-3); font-size:18px; font-weight:300; flex-shrink:0; transition:transform .2s; }
+    .faq-item2.open .faq-ic2 { transform:rotate(45deg); }
+    .faq-a2 { max-height:0; overflow:hidden; transition:max-height .25s ease; }
+    .faq-item2.open .faq-a2 { max-height:200px; }
+    .faq-a2-inner { padding:0 18px 16px; font-size:13.5px; color:var(--text-2); line-height:1.65; border-top:1px solid var(--border-soft); padding-top:12px; }
+
+    /* Final CTA */
+    .final-cta { background:var(--bg-1); border:1px solid var(--border); border-radius:18px; padding:72px 48px; text-align:center; position:relative; overflow:hidden; }
+    .final-cta-glow { position:absolute; inset:0; background:radial-gradient(ellipse 700px 260px at 50% 0%, rgba(76,111,255,0.16), transparent 70%); pointer-events:none; }
+
+    /* Footer */
+    .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:40px; }
+    .footer-col-head { font-size:10.5px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-3); font-weight:500; margin-bottom:14px; }
+    .footer-link { display:block; font-size:13px; color:var(--text-1); text-decoration:none; padding:4px 0; }
+    .footer-link:hover { color:var(--text-0); }
+
+    /* Mobile polish */
+    @media (max-width: 800px) {
+      .pricing-grid { grid-template-columns:1fr; }
+      .auth-layout { grid-template-columns:1fr; gap:40px; }
+      .auth-preview { display:none; }
+      .footer-grid { grid-template-columns:1fr 1fr; gap:32px; }
+      .footer-brand { grid-column:1/-1; }
+      .final-cta { padding:48px 24px; }
+    }
+    @media (max-width: 540px) {
+      .footer-grid { grid-template-columns:1fr 1fr; }
+      .mid-h2 { font-size:28px; }
+      h1 { font-size:32px; }
+      .hero-sub { font-size:15px; }
+      .container { padding:0 16px; }
+      .nav-inner { padding:0 16px; }
+      .stage { display:none; }
+      .trust-inner { grid-template-columns:1fr 1fr; }
+      .trust-cell:nth-child(n) { border-right:0; border-bottom:1px solid var(--border-soft); }
+      .trust-cell:last-child { border-bottom:0; }
+      .final-cta { padding:40px 20px; border-radius:14px; }
+    }
+    /* btn-outline */
+    .btn-outline { background:transparent; color:var(--text-0); border:1px solid var(--border-strong); }
+    .btn-outline:hover { background:var(--bg-2); }
+  </style>
+
+</div>
+
+<script>
+  // Sticky border-on-scroll
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 4);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Mobile menu
+  const toggle = document.getElementById('menuToggle');
+  const menu = document.getElementById('mobileMenu');
+  if (toggle) toggle.addEventListener('click', () => menu.classList.toggle('open'));
+
+  // Auth tabs
+  function switchTab(tab) {
+    document.getElementById('form-signin').style.display = tab === 'signin' ? 'flex' : 'none';
+    document.getElementById('form-signup').style.display = tab === 'signup' ? 'flex' : 'none';
+    document.getElementById('tab-signin').classList.toggle('active', tab === 'signin');
+    document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  }
+
+  // FAQ accordion
+  function toggleFaq(id) {
+    const item = document.getElementById(id);
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item2').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  }
+  // Open first FAQ by default
+  document.getElementById('faq1').classList.add('open');
+</script>
+</body>
+</html>
